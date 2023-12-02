@@ -18,7 +18,7 @@ Steps:
     * Copy config.fugletrading.ini.example and cert.p12.example from the config-example directory to the config directory.
     * Rename config.fugletrading.ini.example to config.fugletrading.ini.
     * Rename cert.p12.example to cert.p12.
-    
+
 * Edit the Configuration File:
     * Open config.fugletrading.ini in a text editor.
     * Fill in the actual values for API keys, secrets, and other configurations as needed.
