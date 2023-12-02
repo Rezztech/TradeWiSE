@@ -45,20 +45,28 @@ Note: For production environments, ensure the security of your configuration fil
 * 透過 API 或訊息佇列與其他服務溝通。
 * 股票價格提醒: 當庫存或關注的股票出現大波動時，通過 Telegram 發送提醒。
 * 定時提醒: 定時提醒檢查庫存企業的狀況。
+- [python-telegram-bot Wiki](https://github.com/python-telegram-bot/python-telegram-bot/wiki/Introduction-to-the-API)
 
 #### TWSE 財務資料服務
 `twse-finance-data`
-* 從 TWSE API 取得公司的財務報表資料。
+* 從 TWSE 取得公司的財務報表資料。
+- [台灣證券交易所 - 簽約資訊公司名冊](https://www.twse.com.tw/zh/products/information/list.html)
+- [台灣證券交易所 - 公開資訊觀測站](https://mops.twse.com.tw/mops/web/index)
+- [台灣證券交易所 - OpenAPI](https://openapi.twse.com.tw/)
 
 #### 股票行情資料服務
 `fugle-market-data`
 * 與券商行情 API 互動，取得股票價格和交易資訊。
 * 提供股票價格和交易資訊的查詢功能。
+- [Fugle MarketData API Key](https://developer.fugle.tw/docs/key/)
+- [Fugle MarketData API Docs](https://developer.fugle.tw/docs/data/http-api/getting-started)
 
 #### 股票交易服務
 `fugle-trading`
 * 與券商交易 API 互動，執行下單服務。
 * 安全性: 考慮實現例如 API 密鑰管理、加密通訊等安全措施。
+- [Fugle Trading API Key](https://fugletradingapi.esunsec.com.tw/keys/apikey/APIKeyManagement)
+- [Fugle Trading API Docs](https://developer.fugle.tw/docs/trading/reference/python)
 
 #### 交易處理服務
 `trade-processing`
@@ -90,17 +98,6 @@ Note: For production environments, ensure the security of your configuration fil
 - 股價合理性分析: 之後可以實現股票應有價格的計算功能，輔助做出更精準的投資決策。
 
 ## Reference
-### Source
-* [台灣證券交易所 - 簽約資訊公司名冊](https://www.twse.com.tw/zh/products/information/list.html)
-* [台灣證券交易所 - 公開資訊觀測站](https://mops.twse.com.tw/mops/web/index)
-* [台灣證券交易所 - OpenAPI](https://openapi.twse.com.tw/)
-
-
-- [Fugle Trading API Key](https://fugletradingapi.esunsec.com.tw/keys/apikey/APIKeyManagement)
-- [Fugle Trading API Docs](https://developer.fugle.tw/docs/trading/intro/)
-- [Fugle MarketData API Key](https://developer.fugle.tw/docs/key/)
-- [Fugle MarketData API Docs](https://developer.fugle.tw/docs/data/intro)
-
 ### Other
 * [GitHub - Topic - TWSE](https://github.com/topics/twse)
 * [元大 API](http://easywin.yuantafutures.com.tw/api/download.html)
