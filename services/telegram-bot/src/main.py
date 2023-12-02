@@ -13,9 +13,17 @@ import requests
 import os
 
 telegram_bot_token = os.getenv('TELEGRAM_BOT_TOKEN')
+telegram_bot_auth_user_id = os.getenv('TELEGRAM_BOT_AUTH_USER_ID')
 
 # Configure logging
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO)
+
+async def is_user_authorized(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    user_id = update.effective_user.id
+    if user_id != int(telegram_bot_auth_user_id):
+        await update.message.reply_text("Sorry, you are not authorized to use this bot.")
+        return False
+    return True
 
 async def get_stock_price(symbol: str):
     response = requests.get(f'http://fugle-market-data:80/price/{symbol}')
@@ -26,9 +34,13 @@ async def get_stock_price(symbol: str):
 
 # Define command handlers
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    if not await is_user_authorized(update, context):
+        return
     await update.message.reply_text("Welcome to TradeWiSE! Your trading assistant.")
 
 async def stock(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    if not await is_user_authorized(update, context):
+        return
     args = context.args
     if not args:
         await update.message.reply_text("Please provide a stock symbol. Usage: /stock <symbol>")
