@@ -1,0 +1,69 @@
+version: '3.8'
+
+services:
+  telegram-bot:
+    build: ./services/telegram-bot
+    restart: always
+    env_file:
+      - ./config/.env
+    networks:
+      - tradewise-net
+
+  twse-finance-data:
+    build: ./services/twse-finance-data
+    restart: always
+    networks:
+      - tradewise-net
+
+  fugle-market-data:
+    build: ./services/fugle-market-data
+    restart: always
+    env_file:
+      - ./config/.env
+    networks:
+      - tradewise-net
+
+  fugle-trading:
+    build: ./services/fugle-trading
+    restart: always
+    volumes:
+      - ./config/config.fugletrading.ini:/app/config.ini
+      - ./config/cert.p12:/app/cert.p12
+    networks:
+      - tradewise-net
+
+  trade-processing:
+    build: ./services/trade-processing
+    restart: always
+    networks:
+      - tradewise-net
+
+  data-analysis:
+    build: ./services/data-analysis
+    restart: always
+    networks:
+      - tradewise-net
+
+  logging:
+    build: ./services/logging
+    restart: always
+    networks:
+      - tradewise-net
+
+  database:
+    image: mariadb
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: yourpassword
+    networks:
+      - tradewise-net
+    volumes:
+      - db-data:/var/lib/mysql
+
+networks:
+  tradewise-net:
+    driver: bridge
+
+volumes:
+  db-data:
+
