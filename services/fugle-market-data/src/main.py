@@ -1,16 +1,28 @@
+from fastapi import FastAPI
 from fugle_marketdata import RestClient
 import os
 
 fugle_marketdata_api_key = os.getenv('FUGLE_MARKET_DATA_API_KEY')
 
-def get_intraday_quote(symbol):
+app = FastAPI()
+
+def get_stock_price(symbol: str):
     client = RestClient(api_key=fugle_marketdata_api_key)
     data = client.stock.intraday.quote(symbol=symbol)
-    return data
+    # Extracting specific data from the response
+    price_data = {
+        "symbol": symbol,
+        "name":          data['name'],
+        "lastPrice":     data['lastPrice'],
+        "openPrice":     data['openPrice'],
+        "highPrice":     data['highPrice'],
+        "lowPrice":      data['lowPrice'],
+        "closePrice":    data['closePrice'],
+        "change":        data['change'],
+        "changePercent": data['changePercent']
+    }
+    return price_data
 
-if __name__ == "__main__":
-    # Example usage
-    symbol = "2331"  # Replace with desired stock symbol
-    quote_data = get_intraday_quote(symbol)
-    print(quote_data)
-
+@app.get("/price/{symbol}")
+async def read_price(symbol: str):
+    return get_stock_price(symbol)
