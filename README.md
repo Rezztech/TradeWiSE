@@ -1,6 +1,6 @@
 # TradeWiSE
 ###### tags: `financial` `stock`
-![DALL·E 2023-12-02 00.04.25 - A sleek and modern logo for a financial technology service named 'TradeWiSE'. The logo should embody elements that represent trading and wisdom, like ](https://hackmd.io/_uploads/HJiQNtvH6.png)
+![DALL·E 2023-12-02 00.04.25 - A sleek and modern logo for a financial technology service named 'TradeWiSE'. The logo should embody elements that represent trading and wisdom, like ](./images/logo.png)
 
 ## TradeWiSE Service Configuration Guide
 
