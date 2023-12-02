@@ -8,12 +8,16 @@ services:
       - ./config/.env
     networks:
       - tradewise-net
+    volumes:
+      - ./services/telegram-bot/src:/app # Bind mount for live development
 
   twse-finance-data:
     build: ./services/twse-finance-data
     restart: always
     networks:
       - tradewise-net
+    volumes:
+      - ./services/twse-finance-data/src:/app # Bind mount for live development
 
   fugle-market-data:
     build: ./services/fugle-market-data
@@ -22,11 +26,14 @@ services:
       - ./config/.env
     networks:
       - tradewise-net
+    volumes:
+      - ./services/fugle-market-data/src:/app # Bind mount for live development
 
   fugle-trading:
     build: ./services/fugle-trading
     restart: always
     volumes:
+      - ./services/fugle-trading/src:/app # Bind mount for live development
       - ./config/config.fugletrading.ini:/app/config.ini
       - ./config/cert.p12:/app/cert.p12
     networks:
@@ -37,27 +44,34 @@ services:
     restart: always
     networks:
       - tradewise-net
+    volumes:
+      - ./services/trade-processing/src:/app # Bind mount for live development
 
   data-analysis:
     build: ./services/data-analysis
     restart: always
     networks:
       - tradewise-net
+    volumes:
+      - ./services/data-analysis/src:/app # Bind mount for live development
 
   logging:
     build: ./services/logging
     restart: always
     networks:
       - tradewise-net
+    volumes:
+      - ./services/logging/src:/app # Bind mount for live development
 
   database:
     image: mariadb
     restart: always
-    environment:
-      MYSQL_ROOT_PASSWORD: yourpassword
+    env_file:
+      - ./config/.env
     networks:
       - tradewise-net
     volumes:
+      - ./services/database/src:/app # Bind mount for live development
       - db-data:/var/lib/mysql
 
 networks:

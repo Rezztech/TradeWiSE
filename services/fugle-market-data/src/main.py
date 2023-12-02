@@ -10,7 +10,7 @@ def get_intraday_quote(symbol):
 
 if __name__ == "__main__":
     # Example usage
-    symbol = "2330"  # Replace with desired stock symbol
+    symbol = "2331"  # Replace with desired stock symbol
     quote_data = get_intraday_quote(symbol)
     print(quote_data)
 
