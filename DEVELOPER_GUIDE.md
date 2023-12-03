@@ -16,6 +16,7 @@
 - [台灣證券交易所 - 簽約資訊公司名冊](https://www.twse.com.tw/zh/products/information/list.html)
 - [台灣證券交易所 - 公開資訊觀測站](https://mops.twse.com.tw/mops/web/index)
 - [台灣證券交易所 - OpenAPI](https://openapi.twse.com.tw/)
+- [FinMind](https://github.com/FinMind/FinMind)
 
 #### 股票行情資料服務
 `fugle-market-data`
