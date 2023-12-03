@@ -61,13 +61,13 @@ This project, TradeWiSE, is primarily licensed under the Mozilla Public License 
 ### Main Project License
 All code in this project, except for the service specifically mentioned below, is released under the Mozilla Public License 2.0. You can find the complete license agreement for the majority of the project in the root directory of this project.
 
-### Special Service License - data-analysis
-The data-analysis service within this project is licensed under the MIT License. This is a more permissive license that allows users to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the service with minimal restrictions.
+### Special Service License - insight-engine
+The insight-engine service within this project is licensed under the MIT License. This is a more permissive license that allows users to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the service with minimal restrictions.
 
-The specific terms of the MIT License for the data-analysis service can be found in the LICENSE file within its directory.
+The specific terms of the MIT License for the insight-engine service can be found in the LICENSE file within its directory.
 
-The rationale behind using different licenses in this project is to accommodate varying degrees of openness and reuse within its components. The MPL 2.0 license, used for the majority of the project, ensures that modifications to the code remain open. However, for the data-analysis service, which involves strategies and methods that individuals might want to modify more freely, the MIT license offers the necessary flexibility. This allows contributors and users of the data-analysis service to adapt and use the code with fewer restrictions, fostering innovation and broader use in diverse contexts.
+The rationale behind using different licenses in this project is to accommodate varying degrees of openness and reuse within its components. The MPL 2.0 license, used for the majority of the project, ensures that modifications to the code remain open. However, for the insight-engine service, which involves strategies and methods that individuals might want to modify more freely, the MIT license offers the necessary flexibility. This allows contributors and users of the insight-engine service to adapt and use the code with fewer restrictions, fostering innovation and broader use in diverse contexts.
 
 ### Note to Contributors
 
-All contributions to the TradeWiSE project, regardless of size, are considered to be released under the Mozilla Public License 2.0, unless specified otherwise. Contributions to the data-analysis service should adhere to the MIT License.
+All contributions to the TradeWiSE project, regardless of size, are considered to be released under the Mozilla Public License 2.0, unless specified otherwise. Contributions to the insight-engine service should adhere to the MIT License.

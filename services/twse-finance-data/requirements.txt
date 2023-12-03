@@ -1,0 +1,5 @@
+requests
+pandas
+sqlalchemy  # or another database library/ORM
+apscheduler
+

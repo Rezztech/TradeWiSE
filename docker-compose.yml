@@ -39,21 +39,21 @@ services:
     networks:
       - tradewise-net
 
-  trade-processing:
-    build: ./services/trade-processing
+  order-manager:
+    build: ./services/order-manager
     restart: always
     networks:
       - tradewise-net
     volumes:
-      - ./services/trade-processing/src:/app # Bind mount for live development
+      - ./services/order-manager/src:/app # Bind mount for live development
 
-  data-analysis:
-    build: ./services/data-analysis
+  insight-engine:
+    build: ./services/insight-engine
     restart: always
     networks:
       - tradewise-net
     volumes:
-      - ./services/data-analysis/src:/app # Bind mount for live development
+      - ./services/insight-engine/src:/app # Bind mount for live development
 
   logging:
     build: ./services/logging
@@ -71,8 +71,19 @@ services:
     networks:
       - tradewise-net
     volumes:
-      - ./services/database/src:/app # Bind mount for live development
       - db-data:/var/lib/mysql
+
+  database-api:
+    build: ./services/database-api
+    restart: always
+    env_file:
+      - ./config/.env
+    networks:
+      - tradewise-net
+    depends_on:
+      - database
+    volumes:
+      - ./services/database-api/src:/app # Bind mount for live development
 
 networks:
   tradewise-net:
