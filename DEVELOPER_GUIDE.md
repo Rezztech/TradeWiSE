@@ -65,4 +65,4 @@
 * [Day 02 - 數據即財富：股市資料來源與取得 ](https://ithelp.ithome.com.tw/articles/10287328)
 * [GitHub - Topic - TWSE](https://github.com/topics/twse)
 * [元大 API](http://easywin.yuantafutures.com.tw/api/download.html)
-
+* [FinMind - 製作個人專屬看盤軟體（二）](https://medium.com/finmind/%E8%A3%BD%E4%BD%9C%E5%80%8B%E4%BA%BA%E5%B0%88%E5%B1%AC%E7%9C%8B%E7%9B%A4%E8%BB%9F%E9%AB%94-%E4%BA%8C-27081ce44689)
