@@ -14,47 +14,58 @@
 #
 
 from fastapi import FastAPI, HTTPException, Body
-#from fastapi import FastAPI, Depends
-from models import create_tables
-#from models import SessionLocal, BalanceSheet
-#from sqlalchemy.orm import Session
+from fastapi import Depends
+from models import create_tables, SessionLocal
+from models import BalanceSheet
+from schemas import BalanceSheetSchema
+from sqlalchemy.orm import Session
+import utils
 
 app = FastAPI()
 
 # Create database tables
 create_tables()
 
-## Dependency for database session
-#def get_db():
-#    db = SessionLocal()
-#    try:
-#        yield db
-#    finally:
-#        db.close()
+# Dependency for database session
+def get_db():
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
 
 # API logic
 @app.get("/")
 def read_root():
     return {"Hello": "World"}
 
-#@app.post("/balance_sheet/")
-#async def create_balance_sheet(balance_sheet: BalanceSheet, db: Session = Depends(get_db)):
-#    # Logic to add balance sheet data to the database
-#    db.add(balance_sheet)
-#    db.commit()
-#    return {"status": "success"}
-#
-#@app.get("/balance_sheet/{company_symbol}/{year}/{season}")
-#async def get_balance_sheet(company_symbol: str, year: int, season: int, db: Session = Depends(get_db)):
-#    # Logic to fetch balance sheet data from the database
-#    balance_sheet_data = db.query(BalanceSheet).filter(
-#        BalanceSheet.company_symbol == company_symbol,
-#        BalanceSheet.year == year,
-#        BalanceSheet.season == season
-#    ).first()
-#
-#    if balance_sheet_data is None:
-#        raise HTTPException(status_code=404, detail="Balance Sheet not found")
-#
-#    return balance_sheet_data
-#
+@app.post("/balance_sheet/")
+async def create_balance_sheet(balance_sheet_schema: BalanceSheetSchema, db: Session = Depends(get_db)):
+    # Check if company exists, if not, create a new one
+    company = db.query(Company).filter(Company.ticker_symbol == balance_sheet_schema.ticker_symbol).first()
+    if not company:
+        company = Company(ticker_symbol=balance_sheet_schema.ticker_symbol)
+        db.add(company)
+        db.commit()
+        db.refresh(company)
+
+    # Now create the balance sheet with the company's ID
+    balance_sheet = utils.convert_schema_to_db_model(company.id, balance_sheet_schema)
+    db.add(balance_sheet)
+    db.commit()
+    return {"status": "success"}
+
+@app.get("/balance_sheet/{ticker_symbol}/{year}/{season}")
+async def get_balance_sheet(ticker_symbol: str, year: int, season: int, db: Session = Depends(get_db)):
+    # Logic to fetch balance sheet data from the database
+    balance_sheet_data = db.query(BalanceSheet).filter(
+        BalanceSheet.ticker_symbol == ticker_symbol,
+        BalanceSheet.year == year,
+        BalanceSheet.season == season
+    ).first()
+
+    if balance_sheet_data is None:
+        raise HTTPException(status_code=404, detail="Balance Sheet not found")
+
+    return balance_sheet_data
+

@@ -15,7 +15,7 @@
 
 import os
 from sqlalchemy import create_engine, Column, Integer, String, Float, Date, ForeignKey
-from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.ext.declarative import declarative_base # These SQLAlchemy model is for database
 from sqlalchemy.orm import sessionmaker
 
 # Database configuration using environment variables
@@ -36,7 +36,8 @@ class BalanceSheet(Base):
     __tablename__ = 'balance_sheet'
     id = Column(Integer, primary_key=True)
     company_id = Column(Integer, ForeignKey('companies.id'))
-    reporting_date = Column(Date)
+    reporting_year = Column(Integer)
+    reporting_season = Column(Integer)
     # Current Assets
     cash = Column(Integer)
     fin_assets_fvpl_curr = Column(Integer)
