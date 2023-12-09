@@ -64,14 +64,14 @@ services:
       - ./services/logging/src:/app # Bind mount for live development
 
   database:
-    image: mariadb
+    image: mongo
     restart: always
     env_file:
       - ./config/.env
     networks:
       - tradewise-net
     volumes:
-      - db-data:/var/lib/mysql
+      - db-data:/data/db
 
   database-api:
     build: ./services/database-api

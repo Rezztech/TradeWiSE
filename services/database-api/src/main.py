@@ -13,26 +13,22 @@
 # Copyright (c) 2023 by wildfootw <wildfootw@wildfoo.tw>
 #
 
-from fastapi import FastAPI, HTTPException, Body
-from fastapi import Depends
-from models import create_tables, SessionLocal
-from models import BalanceSheet
-from schemas import BalanceSheetSchema
-from sqlalchemy.orm import Session
-import utils
+from fastapi import FastAPI, HTTPException
+from pymongo import MongoClient
+from utils.encoder import JSONEncoder
+import json
+import os
 
 app = FastAPI()
 
-# Create database tables
-create_tables()
+# Load environment variables
+MONGO_USER = os.getenv("MONGO_INITDB_ROOT_USERNAME")
+MONGO_PASSWORD = os.getenv("MONGO_INITDB_ROOT_PASSWORD")
+MONGO_DB = os.getenv("MONGO_DATABASE")
 
-# Dependency for database session
-def get_db():
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
+# MongoDB connection
+client = MongoClient(f"mongodb://{MONGO_USER}:{MONGO_PASSWORD}@database:27017/")
+db = client[MONGO_DB]
 
 # API logic
 @app.get("/")
@@ -40,32 +36,25 @@ def read_root():
     return {"Hello": "World"}
 
 @app.post("/balance_sheet/")
-async def create_balance_sheet(balance_sheet_schema: BalanceSheetSchema, db: Session = Depends(get_db)):
-    # Check if company exists, if not, create a new one
-    company = db.query(Company).filter(Company.ticker_symbol == balance_sheet_schema.ticker_symbol).first()
-    if not company:
-        company = Company(ticker_symbol=balance_sheet_schema.ticker_symbol)
-        db.add(company)
-        db.commit()
-        db.refresh(company)
-
-    # Now create the balance sheet with the company's ID
-    balance_sheet = utils.convert_schema_to_db_model(company.id, balance_sheet_schema)
-    db.add(balance_sheet)
-    db.commit()
+async def create_balance_sheet(balance_sheet: dict):
+    collection = db.balance_sheets
+    collection.insert_one(balance_sheet)
     return {"status": "success"}
 
 @app.get("/balance_sheet/{ticker_symbol}/{year}/{season}")
-async def get_balance_sheet(ticker_symbol: str, year: int, season: int, db: Session = Depends(get_db)):
-    # Logic to fetch balance sheet data from the database
-    balance_sheet_data = db.query(BalanceSheet).filter(
-        BalanceSheet.ticker_symbol == ticker_symbol,
-        BalanceSheet.year == year,
-        BalanceSheet.season == season
-    ).first()
+async def get_balance_sheet(ticker_symbol: str, year: int, season: int):
+    collection = db.balance_sheets
+    balance_sheet = collection.find_one({"ticker_symbol": ticker_symbol, "reporting_year": year, "reporting_season": season})
+    if balance_sheet:
+        # Serialize MongoDB document using the custom JSON Encoder
+        return json.loads(json.dumps(balance_sheet, cls=JSONEncoder))
+    raise HTTPException(status_code=404, detail="Balance sheet not found")
 
-    if balance_sheet_data is None:
-        raise HTTPException(status_code=404, detail="Balance Sheet not found")
-
-    return balance_sheet_data
+@app.delete("/balance_sheet/{ticker_symbol}/{year}/{season}")
+async def delete_balance_sheet(ticker_symbol: str, year: int, season: int):
+    collection = db.balance_sheets
+    result = collection.delete_one({"ticker_symbol": ticker_symbol, "reporting_year": year, "reporting_season": season})
+    if result.deleted_count:
+        return {"status": "success", "message": "Balance sheet deleted"}
+    raise HTTPException(status_code=404, detail="Balance sheet not found")
 
