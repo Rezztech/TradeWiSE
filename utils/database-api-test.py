@@ -10,7 +10,7 @@ url = 'http://database-api/balance_sheet/'
 
 # Test data for posting a balance sheet
 post_data = {
-    "ticker_symbol": "2330",
+    "ticker_symbol": "TEST",
     "reporting_year": 2020,
     "reporting_season": 4,
     "cash": 100000,
@@ -21,7 +21,7 @@ response = requests.post(url, json=post_data)
 print("POST Response:", response.json())
 
 # Test data for getting a balance sheet
-get_url = f'{url}2330/2020/4'
+get_url = f'{url}TEST/2020/4'
 
 # Sending a GET request
 response = requests.get(get_url)
