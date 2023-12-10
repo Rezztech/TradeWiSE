@@ -8,3 +8,32 @@ services:
     networks:
       - tradewise-net
 
+  database:
+    image: mongo
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME="tradewise_user"
+      - MONGO_INITDB_ROOT_PASSWORD="xxxxxxxxxxxxxxxx"
+      - MONGO_DATABASE="tradewise"
+    networks:
+      - tradewise-net
+    volumes:
+      - db-data:/data/db
+
+  database-api:
+    build: ./services/database-api
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME="tradewise_user"
+      - MONGO_INITDB_ROOT_PASSWORD="xxxxxxxxxxxxxxxx"
+      - MONGO_DATABASE="tradewise"
+    networks:
+      - tradewise-net
+    depends_on:
+      - database
+
+networks:
+  tradewise-net:
+    driver: bridge
+
+volumes:
+  db-data:
+
