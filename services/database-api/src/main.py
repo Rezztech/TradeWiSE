@@ -22,6 +22,7 @@ import os
 
 # Pydantic model for balance sheet request validation
 class BalanceSheetRequest(BaseModel):
+    version: str
     ticker_symbol: str
     reporting_year: int
     reporting_season: int
