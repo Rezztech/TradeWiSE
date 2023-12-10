@@ -11,8 +11,9 @@
 - [python-telegram-bot Wiki](https://github.com/python-telegram-bot/python-telegram-bot/wiki/Introduction-to-the-API)
 
 #### TWSE 財務資料服務
-`twse-finance-data`
+`twse-data-crawler`
 * 從 TWSE 取得公司的財務報表資料。
+* API 資料不夠清楚，還是用爬的。
 - [台灣證券交易所 - 簽約資訊公司名冊](https://www.twse.com.tw/zh/products/information/list.html)
 - [台灣證券交易所 - 公開資訊觀測站](https://mops.twse.com.tw/mops/web/index)
 - [台灣證券交易所 - OpenAPI](https://openapi.twse.com.tw/)
@@ -33,18 +34,19 @@
 - [Fugle Trading API Docs](https://developer.fugle.tw/docs/trading/reference/python)
 
 #### 交易處理服務
-`trade-processing`
+`order-manager`
 * 負責處理股票買賣的具體邏輯，例如自動下單、監控指定價格等。
 
 #### 資料分析服務
-`data-analysis`
+`insight-engine`
 * 分析財務報表，識別長期穩定盈利的企業。
 * 可進行複雜的資料分析和處理，支援決策制定。
 
 #### 資料庫服務
-`database`
+`database` `database-api`
 * 管理資料儲存，例如財務報表、股票交易資料等。
 * 提供資料的持久化和查詢功能。
+* [公開資訊觀測站XBRL財報建檔工具暨分類標準下載](https://siitest.twse.com.tw/nas/taxonomy/taxonomy.html) (中英文會計科目對照表)
 
 #### 通知和日誌服務
 `logging`
