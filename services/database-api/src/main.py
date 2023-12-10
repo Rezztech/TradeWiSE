@@ -13,11 +13,18 @@
 # Copyright (c) 2023 by wildfootw <wildfootw@wildfoo.tw>
 #
 
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, status
 from pymongo import MongoClient
 from utils.encoder import JSONEncoder
+from pydantic import BaseModel
 import json
 import os
+
+# Pydantic model for balance sheet request validation
+class BalanceSheetRequest(BaseModel):
+    ticker_symbol: str
+    reporting_year: int
+    reporting_season: int
 
 app = FastAPI()
 
@@ -36,10 +43,24 @@ def read_root():
     return {"Hello": "World"}
 
 @app.post("/balance_sheet/")
-async def create_balance_sheet(balance_sheet: dict):
+async def create_balance_sheet(balance_sheet_request: BalanceSheetRequest):
     collection = db.balance_sheets
-    collection.insert_one(balance_sheet)
-    return {"status": "success"}
+    existing_sheet = collection.find_one({
+        "ticker_symbol": balance_sheet_request.ticker_symbol,
+        "reporting_year": balance_sheet_request.reporting_year,
+        "reporting_season": balance_sheet_request.reporting_season
+    })
+
+    if existing_sheet:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail="Balance sheet already exists"
+        )
+
+    # Convert Pydantic model to dictionary for MongoDB insertion
+    balance_sheet_data = balance_sheet_request.dict()
+    collection.insert_one(balance_sheet_data)
+    return {"message": "Balance sheet created"}
 
 @app.get("/balance_sheet/{ticker_symbol}/{year}/{season}")
 async def get_balance_sheet(ticker_symbol: str, year: int, season: int):
@@ -55,6 +76,6 @@ async def delete_balance_sheet(ticker_symbol: str, year: int, season: int):
     collection = db.balance_sheets
     result = collection.delete_one({"ticker_symbol": ticker_symbol, "reporting_year": year, "reporting_season": season})
     if result.deleted_count:
-        return {"status": "success", "message": "Balance sheet deleted"}
+        return {"message": "Balance sheet deleted"}
     raise HTTPException(status_code=404, detail="Balance sheet not found")
 
