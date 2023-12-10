@@ -1,0 +1,14 @@
+name: TEST API
+
+on: [push, pull_request]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Run tests
+      run: docker compose -f docker-compose.yml -f docker-compose.test.yml run test
+
