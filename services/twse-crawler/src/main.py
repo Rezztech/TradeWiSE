@@ -14,15 +14,26 @@
 #
 
 import requests
-import pandas
+import pandas as pd
 from io import StringIO
-from apscheduler.schedulers.background import BackgroundScheduler
+import asyncio
+import logging
+from datetime import datetime
+import threading
+import queue
 
 # URLs for different types of financial reports
-balance_sheet_url = "https://mops.twse.com.tw/mops/web/ajax_t164sb03"       # URL for Balance Sheet
-income_statement_url = "https://mops.twse.com.tw/mops/web/ajax_t164sb04"    # URL for Income Statement
-cash_flow_url = "https://mops.twse.com.tw/mops/web/ajax_t164sb05"           # URL for Cash Flow Statement
+BALANCE_SHEET_URL = "https://mops.twse.com.tw/mops/web/ajax_t164sb03"
+INCOME_STATEMENT_URL = "https://mops.twse.com.tw/mops/web/ajax_t164sb04"
+CASH_FLOW_URL = "https://mops.twse.com.tw/mops/web/ajax_t164sb05"
 
+# Set up logging
+logging.basicConfig(level=logging.INFO)
+
+# Task Queue
+task_queue = queue.Queue()
+
+# Function to extract balance sheet
 def extract_balance_sheet(html_dataframe, year, season):
     # Season to date mapping
     season_to_date = {1: "03月31日", 2: "06月30日", 3: "09月30日", 4: "12月31日"}
@@ -42,7 +53,8 @@ def extract_balance_sheet(html_dataframe, year, season):
     data_dict = dict(zip(keys, values))
     return data_dict
 
-def crawl_financial_report(url, stock_number, year, season):
+# Function to crawl financial report
+def crawl_financial_report(url, ticker_symbol, year, season):
     form_data = {
         'encodeURIComponent': 1,
         'step': 1,
@@ -69,34 +81,52 @@ def crawl_financial_report(url, stock_number, year, season):
             print(f"Error occurred while parsing HTML: {e}")
             return None
 
-
-# Example usage
-stock_number = 2330
-year = 111
-season = 4
-html_dataframe = crawl_financial_report(balance_sheet_url, stock_number, year, season)
-data_dict = extract_balance_sheet(html_dataframe, year, season)
-print(data_dict)
-
-def store_data_in_database(data):
-    engine = create_engine('your-database-connection-string')
-    data.to_sql('financial_statements', engine, if_exists='append')
-
-def scheduled_job():
-    print("Fetching financial data...")
-    # Example: Fetching data for 2021, season 1
-    data = financial_statement(2021, 1)
-    store_data_in_database(data)
-
-scheduler = BackgroundScheduler()
-scheduler.add_job(scheduled_job, 'interval', hours=24)  # Adjust the interval as needed
-scheduler.start()
-
-# To keep the script running
-try:
-    import time
+# Worker function for handling tasks
+def worker():
     while True:
-        time.sleep(1)
-except (KeyboardInterrupt, SystemExit):
-    scheduler.shutdown()
+        task = task_queue.get()
+        try:
+            process_task(task)
+        except Exception as e:
+            logging.error(f"Error processing task: {e}")
+        finally:
+            task_queue.task_done()
+
+# Function to process each task
+def process_task(task):
+    ticker_symbol, year, season = task
+    html_dataframe = crawl_financial_report(BALANCE_SHEET_URL, ticker_symbol, year, season)
+    if html_dataframe is not None:
+        data_dict = extract_balance_sheet(html_dataframe, year, season)
+        logging.info(f"Processed data for ticker {ticker_symbol}, year {year}, season {season}")
+        # Further processing and storing data
+        store_data(data_dict)
+
+# Function to store data into database
+def store_data(data):
+    # Store data into database through internal API
+    pass
+
+# Initialize and start worker threads
+NUM_WORKERS = 5
+for _ in range(NUM_WORKERS):
+    thread = threading.Thread(target=worker)
+    thread.daemon = True
+    thread.start()
+
+# Function to schedule crawling tasks
+def schedule_crawling_tasks():
+    current_year = datetime.now().year
+    for year in range(2000, current_year + 1):  # Historical data from 2000
+        for season in range(1, 5):
+            for ticker_symbol in all_ticker_symbols:  # List of all ticker symbols
+                task_queue.put((ticker_symbol, year, season))
+
+# Function to start the crawler
+def start_crawler():
+    schedule_crawling_tasks()
+    task_queue.join()
+
+# Example call to start the crawler
+start_crawler()
 
