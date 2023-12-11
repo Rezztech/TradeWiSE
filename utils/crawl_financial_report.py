@@ -42,13 +42,13 @@ def extract_balance_sheet(html_dataframe, year, season):
     data_dict = dict(zip(keys, values))
     return data_dict
 
-def crawl_financial_report(url, stock_number, year, season):
+def crawl_financial_report(url, ticker_symbol, year, season):
     form_data = {
         'encodeURIComponent': 1,
         'step': 1,
         'firstin': 1,
         'off': 1,
-        'co_id': stock_number,
+        'co_id': ticker_symbol,
         'year': year,
         'season': season,
     }
@@ -71,10 +71,10 @@ def crawl_financial_report(url, stock_number, year, season):
 
 
 # Example usage
-stock_number = 2330
-year = 111
-season = 4
-html_dataframe = crawl_financial_report(balance_sheet_url, stock_number, year, season)
-data_dict = extract_balance_sheet(html_dataframe, year, season)
+ticker_symbol = 2330
+reporting_year = 111
+reporting_season = 4
+html_dataframe = crawl_financial_report(balance_sheet_url, ticker_symbol, reporting_year, reporting_season)
+data_dict = extract_balance_sheet(html_dataframe, reporting_year, reporting_season)
 print(data_dict)
 

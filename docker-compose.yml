@@ -11,13 +11,13 @@ services:
     volumes:
       - ./services/telegram-bot/src:/app # Bind mount for live development
 
-  twse-finance-data:
-    build: ./services/twse-finance-data
+  twse-crawler:
+    build: ./services/twse-crawler
     restart: always
     networks:
       - tradewise-net
     volumes:
-      - ./services/twse-finance-data/src:/app # Bind mount for live development
+      - ./services/twse-crawler/src:/app # Bind mount for live development
 
   fugle-market-data:
     build: ./services/fugle-market-data
