@@ -16,16 +16,18 @@
 import requests
 import pandas as pd
 from io import StringIO
-import asyncio
 import logging
 from datetime import datetime
 import threading
 import queue
+import time
 
 # URLs for different types of financial reports
-BALANCE_SHEET_URL = "https://mops.twse.com.tw/mops/web/ajax_t164sb03"
-INCOME_STATEMENT_URL = "https://mops.twse.com.tw/mops/web/ajax_t164sb04"
-CASH_FLOW_URL = "https://mops.twse.com.tw/mops/web/ajax_t164sb05"
+REPORT_URLS = {
+    "balance_sheet": "https://mops.twse.com.tw/mops/web/ajax_t164sb03",
+    "income_statement": "https://mops.twse.com.tw/mops/web/ajax_t164sb04",
+    "cash_flow": "https://mops.twse.com.tw/mops/web/ajax_t164sb05"
+}
 
 # Set up logging
 logging.basicConfig(level=logging.INFO)
@@ -33,8 +35,11 @@ logging.basicConfig(level=logging.INFO)
 # Task Queue
 task_queue = queue.Queue()
 
-# Function to extract balance sheet
-def extract_balance_sheet(html_dataframe, year, season):
+# Rate Limiter
+REQUEST_INTERVAL = 1  # in seconds
+
+# Function to extract report data
+def extract_report_data(html_dataframe, year, season, report_type):
     # Season to date mapping
     season_to_date = {1: "03月31日", 2: "06月30日", 3: "09月30日", 4: "12月31日"}
     date_col = f"{year}年{season_to_date[season]}"
@@ -87,6 +92,7 @@ def worker():
         task = task_queue.get()
         try:
             process_task(task)
+            time.sleep(REQUEST_INTERVAL)  # Rate limiting
         except Exception as e:
             logging.error(f"Error processing task: {e}")
         finally:
@@ -94,11 +100,12 @@ def worker():
 
 # Function to process each task
 def process_task(task):
-    ticker_symbol, year, season = task
-    html_dataframe = crawl_financial_report(BALANCE_SHEET_URL, ticker_symbol, year, season)
+    ticker_symbol, year, season, report_type = task
+    url = REPORT_URLS[report_type]
+    html_dataframe = crawl_financial_report(url, ticker_symbol, year, season)
     if html_dataframe is not None:
-        data_dict = extract_balance_sheet(html_dataframe, year, season)
-        logging.info(f"Processed data for ticker {ticker_symbol}, year {year}, season {season}")
+        data_dict = extract_report_data(html_dataframe, year, season, report_type)
+        logging.info(f"Processed {report_type} for ticker {ticker_symbol}, year {year}, season {season}")
         # Further processing and storing data
         store_data(data_dict)
 
@@ -117,14 +124,22 @@ for _ in range(NUM_WORKERS):
 # Function to schedule crawling tasks
 def schedule_crawling_tasks():
     current_year = datetime.now().year
-    for year in range(2000, current_year + 1):  # Historical data from 2000
-        for season in range(1, 5):
-            for ticker_symbol in all_ticker_symbols:  # List of all ticker symbols
-                task_queue.put((ticker_symbol, year, season))
+    report_types = ["balance_sheet", "income_statement", "cash_flow"]
+    for ticker_symbol in all_ticker_symbols:  # List of all ticker symbols
+        for report_type in report_types:
+            for year in range(current_year, 1999, -1):  # Historical data from current year to 2000
+                for season in range(1, 5):
+                    task_queue.put((ticker_symbol, year, season, report_type))
+
+# Function to fetch new data periodically
+def fetch_new_data():
+    # Periodically add new tasks to the queue for the latest data
+    pass
 
 # Function to start the crawler
 def start_crawler():
     schedule_crawling_tasks()
+    fetch_new_data()
     task_queue.join()
 
 # Example call to start the crawler
