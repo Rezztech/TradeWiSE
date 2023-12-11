@@ -19,8 +19,8 @@ import pandas as pd
 from io import StringIO
 import logging
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
-from datetime import datetime
-from asyncio import Semaphore
+import functools
+import time
 
 # URLs for different types of financial reports
 REPORT_URLS = {
@@ -28,14 +28,35 @@ REPORT_URLS = {
     "income_statement": "https://mops.twse.com.tw/mops/web/ajax_t164sb04",
     "cash_flow": "https://mops.twse.com.tw/mops/web/ajax_t164sb05"
 }
-REQUEST_INTERVAL = 1  # in seconds, adjust as needed
-MAX_CONCURRENT_REQUESTS = 5  # Max number of concurrent requests
 
 # Set up logging
 logging.basicConfig(level=logging.INFO)
 
-# Semaphore for rate limiting
-semaphore = Semaphore(MAX_CONCURRENT_REQUESTS)
+class RateLimiter:
+    def __init__(self, calls_per_second):
+        self.period = 1.0 / calls_per_second
+        self.last_called = time.monotonic()
+
+    async def __aenter__(self):
+        current = time.monotonic()
+        sleep_for = self.last_called + self.period - current
+        if sleep_for > 0:
+            await asyncio.sleep(sleep_for)
+        self.last_called = time.monotonic()
+
+    async def __aexit__(self, exc_type, exc_val, exc_tb):
+        pass
+
+def rate_limited(calls_per_second):
+    limiter = RateLimiter(calls_per_second)
+
+    def decorator(func):
+        @functools.wraps(func)
+        async def wrapped(*args, **kwargs):
+            async with limiter:
+                return await func(*args, **kwargs)
+        return wrapped
+    return decorator
 
 # Async function to extract report data
 async def extract_report_data(html_dataframe, year, season, report_type):
@@ -58,48 +79,32 @@ async def extract_report_data(html_dataframe, year, season, report_type):
     return data_dict
 
 # Async function to crawl financial report
+@rate_limited(1)  # 1 request per second
 async def crawl_financial_report(url, ticker_symbol, year, season):
-    async with semaphore:
-        form_data = {
-            'encodeURIComponent': 1,
-            'step': 1,
-            'firstin': 1,
-            'off': 1,
-            'co_id': ticker_symbol,
-            'year': year,
-            'season': season,
-        }
-        headers = {
-            'User-Agent': 'Your User Agent'
-        }
-        await asyncio.sleep(REQUEST_INTERVAL)  # Respect rate limit
-        async with aiohttp.ClientSession() as session:
-            async with session.post(url, data=form_data, headers=headers) as response:
-                if response.status != 200:
-                    logging.error(f"Failed to retrieve data: Status code {response.status}")
-                    return None
-                try:
-                    text = await response.text()
-                    html_dataframe = pd.read_html(StringIO(text))[1].fillna("")
-                    return html_dataframe
-                except Exception as e:
-                    logging.error(f"Error occurred while parsing HTML: {e}")
-                    return None
-
-# Function to process each task
-async def process_task(ticker_symbol, year, season, report_type):
-    url = REPORT_URLS[report_type]
-    html_dataframe = await crawl_financial_report(url, ticker_symbol, year, season)
-    if html_dataframe is not None:
-        data_dict = await extract_report_data(html_dataframe, year, season, report_type)
-        logging.info(f"Processed {report_type} for ticker {ticker_symbol}, year {year}, season {season}")
-        # Further processing and storing data
-        await store_data(data_dict)
-
-# Async function to store data into database
-async def store_data(data):
-    # Store data into database through internal API
-    pass
+    form_data = {
+        'encodeURIComponent': 1,
+        'step': 1,
+        'firstin': 1,
+        'off': 1,
+        'co_id': stock_number,
+        'year': year,
+        'season': season,
+    }
+    headers = {
+        'User-Agent': 'Your User Agent'
+    }
+    async with aiohttp.ClientSession() as session:
+        async with session.post(url, data=form_data, headers=headers) as response:
+            if response.status != 200:
+                logging.error(f"Failed to retrieve data: Status code {response.status}")
+                return None
+            try:
+                text = await response.text()
+                html_dataframe = pd.read_html(StringIO(text))[1].fillna("")
+                return html_dataframe
+            except Exception as e:
+                logging.error(f"Error occurred while parsing HTML: {e}")
+                return None
 
 # Function to schedule crawling tasks
 def schedule_crawling_tasks(scheduler):
@@ -107,9 +112,12 @@ def schedule_crawling_tasks(scheduler):
     current_year = datetime.now().year
     for ticker_symbol in all_ticker_symbols:  # List of all ticker symbols
         for report_type in report_types:
-            for year in range(current_year, 1999, -1):  # Historical data from current year to 2000
+            for year in range(current_year, 1999, -1):  # Historical data
                 for season in range(1, 5):
-                    scheduler.add_job(process_task, args=(ticker_symbol, year, season, report_type))
+                    scheduler.add_job(
+                        crawl_financial_report, 
+                        args=(REPORT_URLS[report_type], ticker_symbol, year, season)
+                    )
 
 # Main function to start the crawler
 async def main():
