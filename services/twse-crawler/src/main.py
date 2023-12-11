@@ -20,6 +20,7 @@ from io import StringIO
 import logging
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from datetime import datetime
+from asyncio import Semaphore
 
 # URLs for different types of financial reports
 REPORT_URLS = {
@@ -27,9 +28,14 @@ REPORT_URLS = {
     "income_statement": "https://mops.twse.com.tw/mops/web/ajax_t164sb04",
     "cash_flow": "https://mops.twse.com.tw/mops/web/ajax_t164sb05"
 }
+REQUEST_INTERVAL = 1  # in seconds, adjust as needed
+MAX_CONCURRENT_REQUESTS = 5  # Max number of concurrent requests
 
 # Set up logging
 logging.basicConfig(level=logging.INFO)
+
+# Semaphore for rate limiting
+semaphore = Semaphore(MAX_CONCURRENT_REQUESTS)
 
 # Async function to extract report data
 async def extract_report_data(html_dataframe, year, season, report_type):
@@ -53,30 +59,32 @@ async def extract_report_data(html_dataframe, year, season, report_type):
 
 # Async function to crawl financial report
 async def crawl_financial_report(url, ticker_symbol, year, season):
-    form_data = {
-        'encodeURIComponent': 1,
-        'step': 1,
-        'firstin': 1,
-        'off': 1,
-        'co_id': ticker_symbol,
-        'year': year,
-        'season': season,
-    }
-    headers = {
-        'User-Agent': 'Your User Agent'
-    }
-    async with aiohttp.ClientSession() as session:
-        async with session.post(url, data=form_data, headers=headers) as response:
-            if response.status != 200:
-                logging.error(f"Failed to retrieve data: Status code {response.status}")
-                return None
-            try:
-                text = await response.text()
-                html_dataframe = pd.read_html(StringIO(text))[1].fillna("")
-                return html_dataframe
-            except Exception as e:
-                logging.error(f"Error occurred while parsing HTML: {e}")
-                return None
+    async with semaphore:
+        form_data = {
+            'encodeURIComponent': 1,
+            'step': 1,
+            'firstin': 1,
+            'off': 1,
+            'co_id': ticker_symbol,
+            'year': year,
+            'season': season,
+        }
+        headers = {
+            'User-Agent': 'Your User Agent'
+        }
+        await asyncio.sleep(REQUEST_INTERVAL)  # Respect rate limit
+        async with aiohttp.ClientSession() as session:
+            async with session.post(url, data=form_data, headers=headers) as response:
+                if response.status != 200:
+                    logging.error(f"Failed to retrieve data: Status code {response.status}")
+                    return None
+                try:
+                    text = await response.text()
+                    html_dataframe = pd.read_html(StringIO(text))[1].fillna("")
+                    return html_dataframe
+                except Exception as e:
+                    logging.error(f"Error occurred while parsing HTML: {e}")
+                    return None
 
 # Function to process each task
 async def process_task(ticker_symbol, year, season, report_type):
