@@ -16,16 +16,15 @@
 import aiohttp
 import asyncio
 import pandas
-from io import StringIO
 import logging
-from apscheduler.schedulers.asyncio import AsyncIOScheduler
 import functools
 import time
 import os
 import datetime
+from io import StringIO
 
 # Set up logging
-log_level = os.environ.get("LOG_LEVEL", "INFO").upper()
+log_level = os.environ.get("LOG_LEVEL", "DEBUG").upper()
 logging.basicConfig(level=log_level, format="%(asctime)s %(levelname)s %(message)s")
 
 class RateLimiter:
@@ -47,8 +46,7 @@ class RateLimiter:
             logging.debug("Rate limiter lock released")
 
 limiter = RateLimiter(calls_per_second=0.1) # Global instance of RateLimiter
-semaphore = asyncio.Semaphore(5) # max_concurrent_tasks
-
+task_queue = asyncio.Queue() # Global instance of asyncio.Queue
 
 def rate_limited(func):
     # Use functools.wraps to preserve metadata of the original function
@@ -124,22 +122,27 @@ async def store_data(data):
 
 # Function to process each report
 async def process_report(ticker_symbol, year, season, report_type):
-    async with semaphore:
-        logging.debug(f"Processing report for ticker {ticker_symbol}, year: {year}, season: {season}, type: {report_type}")
-        html_dataframe = await crawl_financial_report(ticker_symbol, year, season, report_type)
-        if html_dataframe is not None:
-            extracted_data = {}
-            if report_type == "balance_sheet":
-                extracted_data = await extract_balance_sheet(html_dataframe, year, season)
-            elif report_type == "income_statement":
-                pass
-            elif report_type == "cash_flow":
-                pass
-            logging.debug(f"Completed data extraction for {ticker_symbol}, year: {year}, season: {season}")
-            await store_data(extracted_data)
+    logging.debug(f"Processing report for ticker {ticker_symbol}, year: {year}, season: {season}, type: {report_type}")
+    html_dataframe = await crawl_financial_report(ticker_symbol, year, season, report_type)
+    if html_dataframe is not None:
+        extracted_data = {}
+        if report_type == "balance_sheet":
+            extracted_data = await extract_balance_sheet(html_dataframe, year, season)
+        elif report_type == "income_statement":
+            pass
+        elif report_type == "cash_flow":
+            pass
+        logging.debug(f"Completed data extraction for {ticker_symbol}, year: {year}, season: {season}")
+        await store_data(extracted_data)
+
+async def task_worker():
+    while True:
+        ticker_symbol, year, season, report_type = await task_queue.get()
+        await process_report(ticker_symbol, year, season, report_type)
+        task_queue.task_done()
 
 # Function to schedule crawling tasks
-def schedule_crawling_tasks(scheduler):
+async def main():
     logging.info("Scheduling crawling tasks")
     #report_types = ["balance_sheet", "income_statement", "cash_flow"]
     report_types = ["balance_sheet"]
@@ -150,24 +153,17 @@ def schedule_crawling_tasks(scheduler):
         for report_type in report_types:
             for year in range(current_year, 2020, -1):  # Historical data
                 for season in range(1, 5):
-                    #logging.debug(f"Scheduled task for report type {report_type}, ticker {ticker_symbol}, year {year}, season {season}")
-                    scheduler.add_job(
-                        process_report,
-                        args=(ticker_symbol, year, season, report_type)
-                    )
+                    logging.debug(f"Scheduled task for report type {report_type}, ticker {ticker_symbol}, year {year}, season {season}")
+                    await task_queue.put((ticker_symbol, year, season, report_type))
 
-# Main function to start the crawler
-async def main():
-    loop = asyncio.get_event_loop()
-    scheduler = AsyncIOScheduler(event_loop=loop)
-    schedule_crawling_tasks(scheduler)
-    scheduler.start()
+    workers = [asyncio.create_task(task_worker()) for _ in range(5)] # Create 5 workers
+    # Wait until all tasks are processed
+    await task_queue.join()
+    # Cancel all workers
+    for worker in workers:
+        worker.cancel()
+    await asyncio.gather(*workers, return_exceptions=True)
 
-    logging.info("Crawler started")
-    # Keep the script running
-    while True:
-        await asyncio.sleep(60)
-
-# Run the crawler
+# Run the main function
 asyncio.run(main())
 
