@@ -45,9 +45,6 @@ class RateLimiter:
             self.last_called = time.monotonic()
             logging.debug("Rate limiter lock released")
 
-limiter = RateLimiter(calls_per_second=0.1) # Global instance of RateLimiter
-task_queue = asyncio.Queue() # Global instance of asyncio.Queue
-
 def rate_limited(func):
     # Use functools.wraps to preserve metadata of the original function
     @functools.wraps(func)
@@ -143,6 +140,10 @@ async def task_worker():
 
 # Function to schedule crawling tasks
 async def main():
+    global limiter, task_queue
+    limiter = RateLimiter(calls_per_second=0.1) # Global instance of RateLimiter
+    task_queue = asyncio.Queue() # Global instance of asyncio.Queue
+
     logging.info("Scheduling crawling tasks")
     #report_types = ["balance_sheet", "income_statement", "cash_flow"]
     report_types = ["balance_sheet"]
