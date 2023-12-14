@@ -13,15 +13,16 @@
 # Copyright (c) 2023 by wildfootw <wildfootw@wildfoo.tw>
 #
 
-import aiohttp
 import asyncio
-import pandas
-import logging
-import functools
-import time
-import os
 import datetime
+import functools
+import logging
+import os
+import time
 from io import StringIO
+
+import aiohttp
+import pandas
 
 # Set up logging
 log_level = os.environ.get("LOG_LEVEL", "DEBUG").upper()
@@ -167,4 +168,3 @@ async def main():
 
 # Run the main function
 asyncio.run(main())
-
