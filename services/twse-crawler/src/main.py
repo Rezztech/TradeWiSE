@@ -32,6 +32,7 @@ class RateLimiter:
         self.period = 1.0 / calls_per_second
         # Create an asyncio lock for synchronizing access in asynchronous context
         self.lock = asyncio.Lock()
+        print(asyncio.get_running_loop())
         self.last_called = time.monotonic()
 
     async def wait(self):
