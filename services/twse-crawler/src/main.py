@@ -103,40 +103,117 @@ async def crawl_financial_report(ticker_symbol, year, season, report_type):
         async with session.post(url, data=form_data, headers=headers) as response:
             logging.debug(f"Received response for {url}, status: {response.status}")
             if response.status != 200:
-                logging.error(f"Failed to retrieve data: Status code {response.status}")
-                return None
+                logging.warning(f"Failed to retrieve data: Status code {response.status}")
+                return {"data": None, "message": "Internal Server Error"}
             try:
                 text = await response.text()
-                html_dataframe = pandas.read_html(StringIO(text))[1].fillna("")
-                return html_dataframe
+                try:
+                    html_dataframe = pandas.read_html(StringIO(text))[1].fillna("")
+                    return {"data": html_dataframe, "message": "Data successfully retrieved"}
+                except ValueError:
+                    # Specific handling for no tables found in HTML
+                    if "查無所需資料！" in text:
+                        logging.info("No data found for the given parameters.")
+                        return {"data": None, "message": "No Data Found"}
+                    else:
+                        logging.warning("HTML parsed but contains no tables.")
+                        return {"data": None, "message": "Internal Server Error"}
             except Exception as e:
-                logging.error(f"Error occurred while parsing HTML: {e}")
-                return None
+                # Update this message to reflect other types of parsing errors
+                logging.warning(f"Unexpected error occurred during HTML parsing or DataFrame creation: {e}")
+                return {"data": None, "message": "Internal Server Error"}
 
 # Async function to store data into database
-async def store_data(data):
-    print(data)
+async def store_data(ticker_symbol, year, season, report_type, data):
+    logging.info(data)
 
 # Function to process each report
 async def process_report(ticker_symbol, year, season, report_type):
-    logging.debug(f"Processing report for ticker {ticker_symbol}, year: {year}, season: {season}, type: {report_type}")
-    html_dataframe = await crawl_financial_report(ticker_symbol, year, season, report_type)
-    if html_dataframe is not None:
-        extracted_data = {}
+    logging.info(f"Processing report for ticker {ticker_symbol}, year: {year}, season: {season}, type: {report_type}")
+
+    # Retrieve the financial report data
+    report_result = await crawl_financial_report(ticker_symbol, year, season, report_type)
+
+    report_result_data = {}
+    # Check if data is available
+    if report_result["data"] is not None:
         if report_type == "balance_sheet":
-            extracted_data = await extract_balance_sheet(html_dataframe, year, season)
+            report_result_data = await extract_balance_sheet(report_result["data"], year, season)
         elif report_type == "income_statement":
+            # Place logic here for income statement extraction
             pass
         elif report_type == "cash_flow":
+            # Place logic here for cash flow extraction
             pass
-        logging.debug(f"Completed data extraction for {ticker_symbol}, year: {year}, season: {season}")
-        await store_data(extracted_data)
+        logging.info(f"Completed data extraction for {ticker_symbol}, year: {year}, season: {season}")
+    else:
+        # Log the message if no data was found or an error occurred
+        report_result_data["message"] = report_result["message"]
+    await store_data(ticker_symbol, year, season, report_type, report_result_data)
 
 async def task_worker():
     while True:
         ticker_symbol, year, season, report_type = await task_queue.get()
         await process_report(ticker_symbol, year, season, report_type)
         task_queue.task_done()
+
+def determine_start_year_and_season():
+    """
+    Determines the starting season and year for data collection based on the current date.
+    The logic is as follows:
+    - Jan to Mar: Collect from the previous year's 4th season.
+    - Apr to Jun: Start from the current year's 1st season.
+    - Jul to Sep: Start from the current year's 2nd season.
+    - Oct to Dec: Start from the current year's 3rd season.
+
+    Returns:
+        tuple: A tuple containing the starting year and season.
+    """
+    now = datetime.datetime.now()
+    current_year = now.year - 1911  # Convert to the local calendar year
+    current_month = now.month
+
+    # Determine the start season and year based on the current month
+    if 1 <= current_month <= 3:
+        start_season = 4
+        start_year = current_year - 1
+    elif 4 <= current_month <= 6:
+        start_season = 1
+        start_year = current_year
+    elif 7 <= current_month <= 9:
+        start_season = 2
+        start_year = current_year
+    else:  # 10 <= current_month <= 12
+        start_season = 3
+        start_year = current_year
+
+    return start_year, start_season
+
+async def schedule_tasks(all_ticker_symbols, report_types, task_queue):
+    """
+    Schedules tasks for collecting data based on the starting season and year.
+    Iterates over each ticker symbol and report type, scheduling tasks for each
+    combination from the starting point going back to the year 110.
+
+    Parameters:
+        all_ticker_symbols (list): A list of all ticker symbols to be processed.
+        report_types (list): A list of report types to be processed.
+        task_queue (asyncio.Queue): An asyncio Queue where tasks will be put for processing.
+    """
+    start_year, start_season = determine_start_year_and_season()
+
+    for ticker_symbol in all_ticker_symbols:
+        for report_type in report_types:
+            # Schedule tasks for each ticker symbol and report type combination.
+            for year in range(start_year, 82, -1):
+                # If it's the start year (the first year in our iteration), we use the calculated start season
+                # Otherwise, for all previous years, we start from the 4th season
+                season_start = start_season if year == start_year else 4
+
+                # Iterate over the seasons in reverse order (4 to 1) for each year
+                for season in range(season_start, 0, -1):
+                    logging.debug(f"Scheduled task for report type {report_type}, ticker {ticker_symbol}, year {year}, season {season}")
+                    await task_queue.put((ticker_symbol, year, season, report_type))
 
 # Function to schedule crawling tasks
 async def main():
@@ -149,13 +226,7 @@ async def main():
     report_types = ["balance_sheet"]
     #all_ticker_symbols = ["2330", "2317", "2454", "3008", "1301", "1303", "1326", "2308"]
     all_ticker_symbols = ["2330", "2317"]
-    current_year = datetime.datetime.now().year
-    for ticker_symbol in all_ticker_symbols:  # List of all ticker symbols
-        for report_type in report_types:
-            for year in range(current_year, 2020, -1):  # Historical data
-                for season in range(1, 5):
-                    logging.debug(f"Scheduled task for report type {report_type}, ticker {ticker_symbol}, year {year}, season {season}")
-                    await task_queue.put((ticker_symbol, year, season, report_type))
+    await schedule_tasks(all_ticker_symbols, report_types, task_queue)
 
     workers = [asyncio.create_task(task_worker()) for _ in range(5)] # Create 5 workers
     # Wait until all tasks are processed
