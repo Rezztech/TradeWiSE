@@ -1,6 +1,38 @@
 version: '3.8'
 
 services:
+  rabbitmq:
+    image: rabbitmq:3
+    restart: always
+    env_file:
+      - ./config/.env
+    networks:
+      - tradewise-net
+    volumes:
+      - rabbitmq-data:/var/lib/rabbitmq
+
+  database:
+    image: mongo
+    restart: always
+    env_file:
+      - ./config/.env
+    networks:
+      - tradewise-net
+    volumes:
+      - db-data:/data/db
+
+  database-api:
+    build: ./services/database-api
+    restart: always
+    env_file:
+      - ./config/.env
+    networks:
+      - tradewise-net
+    depends_on:
+      - database
+    volumes:
+      - ./services/database-api/src:/app # Bind mount for live development
+
   telegram-bot:
     build: ./services/telegram-bot
     restart: always
@@ -55,6 +87,14 @@ services:
     volumes:
       - ./services/insight-engine/src:/app # Bind mount for live development
 
+  fetch-planner:
+    build: ./services/fetch-planner
+    restart: always
+    networks:
+      - tradewise-net
+    volumes:
+      - ./services/fetch-planner/src:/app # Bind mount for live development
+
   logging:
     build: ./services/logging
     restart: always
@@ -63,32 +103,11 @@ services:
     volumes:
       - ./services/logging/src:/app # Bind mount for live development
 
-  database:
-    image: mongo
-    restart: always
-    env_file:
-      - ./config/.env
-    networks:
-      - tradewise-net
-    volumes:
-      - db-data:/data/db
-
-  database-api:
-    build: ./services/database-api
-    restart: always
-    env_file:
-      - ./config/.env
-    networks:
-      - tradewise-net
-    depends_on:
-      - database
-    volumes:
-      - ./services/database-api/src:/app # Bind mount for live development
-
 networks:
   tradewise-net:
     driver: bridge
 
 volumes:
   db-data:
+  rabbitmq-data:
 
