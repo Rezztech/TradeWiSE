@@ -13,9 +13,11 @@
 # Copyright (c) 2023 by wildfootw <wildfootw@wildfoo.tw>
 #
 
+import json
+
 from bson import ObjectId
 from fastapi.encoders import jsonable_encoder
-import json
+
 
 # Custom JSON Encoder for handling ObjectId
 class JSONEncoder(json.JSONEncoder):
@@ -23,4 +25,3 @@ class JSONEncoder(json.JSONEncoder):
         if isinstance(obj, ObjectId):
             return str(obj)  # Convert ObjectId to string for JSON serialization
         return super(JSONEncoder, self).default(obj)
-

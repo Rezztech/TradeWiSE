@@ -17,4 +17,3 @@ jobs:
 
     - name: Stop services
       run: docker-compose -f docker-compose.test.yml down
-

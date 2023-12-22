@@ -13,9 +13,10 @@
 # Copyright (c) 2023 by wildfootw <wildfootw@wildfoo.tw>
 #
 
+import os
+
 from fastapi import FastAPI
 from fugle_marketdata import RestClient
-import os
 
 fugle_marketdata_api_key = os.getenv('FUGLE_MARKET_DATA_API_KEY')
 

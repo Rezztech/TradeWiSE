@@ -13,12 +13,15 @@
 # Copyright (c) 2023 by wildfootw <wildfootw@wildfoo.tw>
 #
 
-from fastapi import FastAPI, HTTPException, status
-from pymongo import MongoClient
-from utils.encoder import JSONEncoder
-from pydantic import BaseModel
 import json
 import os
+
+from fastapi import FastAPI, HTTPException, status
+from pydantic import BaseModel
+from pymongo import MongoClient
+
+from utils.encoder import JSONEncoder
+
 
 # Pydantic model for balance sheet request validation
 class BalanceSheetRequest(BaseModel):
@@ -79,4 +82,3 @@ async def delete_balance_sheet(ticker_symbol: str, year: int, season: int):
     if result.deleted_count:
         return {"message": "Balance sheet deleted"}
     raise HTTPException(status_code=404, detail="Balance sheet not found")
-

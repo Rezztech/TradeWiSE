@@ -36,4 +36,3 @@ networks:
 
 volumes:
   db-test:
-
