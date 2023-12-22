@@ -1,0 +1,203 @@
+<mxfile host="Electron" modified="2023-12-20T15:09:05.413Z" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/22.1.11 Chrome/114.0.5735.289 Electron/25.9.8 Safari/537.36" etag="N3WafK4DZS8pdBrhpHhN" version="22.1.11" type="device">
+  <diagram name="Page-1" id="edf60f1a-56cd-e834-aa8a-f176f3a09ee4">
+    <mxGraphModel dx="1091" dy="638" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1169" pageHeight="827" background="none" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="ee3Hf3BzdbRgXfLqMHV_-15" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;sketch=1;curveFitting=1;jiggle=2;" parent="1" source="ee3Hf3BzdbRgXfLqMHV_-10" target="ee3Hf3BzdbRgXfLqMHV_-14" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="ee3Hf3BzdbRgXfLqMHV_-10" value="Access the company-specific report version table from the database (contains version details for each financial report by season)" style="rounded=0;whiteSpace=wrap;html=1;sketch=1;curveFitting=1;jiggle=2;" parent="1" vertex="1">
+          <mxGeometry x="120" y="40" width="220" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="ee3Hf3BzdbRgXfLqMHV_-18" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;sketch=1;curveFitting=1;jiggle=2;" parent="1" source="ee3Hf3BzdbRgXfLqMHV_-14" target="ee3Hf3BzdbRgXfLqMHV_-16" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="ee3Hf3BzdbRgXfLqMHV_-14" value="for each company" style="rounded=0;whiteSpace=wrap;html=1;sketch=1;curveFitting=1;jiggle=2;" parent="1" vertex="1">
+          <mxGeometry x="170" y="160" width="120" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="ee3Hf3BzdbRgXfLqMHV_-25" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;sketch=1;curveFitting=1;jiggle=2;" parent="1" source="ee3Hf3BzdbRgXfLqMHV_-16" target="ee3Hf3BzdbRgXfLqMHV_-24" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="ee3Hf3BzdbRgXfLqMHV_-29" value="No" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];sketch=1;curveFitting=1;jiggle=2;" parent="ee3Hf3BzdbRgXfLqMHV_-25" vertex="1" connectable="0">
+          <mxGeometry x="-0.8512" y="1" relative="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="oFhDvv9RlIDCHvoSyQMo-15" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.25;entryY=0;entryDx=0;entryDy=0;sketch=1;curveFitting=1;jiggle=2;" edge="1" parent="1" source="ee3Hf3BzdbRgXfLqMHV_-16" target="oFhDvv9RlIDCHvoSyQMo-4">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="oFhDvv9RlIDCHvoSyQMo-27" value="Yes" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];sketch=1;curveFitting=1;jiggle=2;" vertex="1" connectable="0" parent="oFhDvv9RlIDCHvoSyQMo-15">
+          <mxGeometry x="-0.8717" relative="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="ee3Hf3BzdbRgXfLqMHV_-16" value="if still have company" style="rhombus;whiteSpace=wrap;html=1;sketch=1;curveFitting=1;jiggle=2;" parent="1" vertex="1">
+          <mxGeometry x="175" y="230" width="110" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="ee3Hf3BzdbRgXfLqMHV_-21" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.497;entryY=-0.049;entryDx=0;entryDy=0;entryPerimeter=0;sketch=1;curveFitting=1;jiggle=2;" parent="1" target="ee3Hf3BzdbRgXfLqMHV_-11" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="229.99999999999977" y="460" as="sourcePoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="ee3Hf3BzdbRgXfLqMHV_-22" value="No" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];sketch=1;curveFitting=1;jiggle=2;" parent="ee3Hf3BzdbRgXfLqMHV_-21" vertex="1" connectable="0">
+          <mxGeometry x="-0.2904" y="2" relative="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="ee3Hf3BzdbRgXfLqMHV_-27" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;sketch=1;curveFitting=1;jiggle=2;" parent="1" source="ee3Hf3BzdbRgXfLqMHV_-24" target="ee3Hf3BzdbRgXfLqMHV_-26" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="ee3Hf3BzdbRgXfLqMHV_-24" value="for each company" style="rounded=0;whiteSpace=wrap;html=1;sketch=1;curveFitting=1;jiggle=2;" parent="1" vertex="1">
+          <mxGeometry x="765" y="190" width="120" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="oFhDvv9RlIDCHvoSyQMo-13" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;sketch=1;curveFitting=1;jiggle=2;" edge="1" parent="1" source="ee3Hf3BzdbRgXfLqMHV_-26" target="ee3Hf3BzdbRgXfLqMHV_-35">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="oFhDvv9RlIDCHvoSyQMo-32" value="Yes" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];sketch=1;curveFitting=1;jiggle=2;" vertex="1" connectable="0" parent="oFhDvv9RlIDCHvoSyQMo-13">
+          <mxGeometry x="-0.3655" relative="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="ee3Hf3BzdbRgXfLqMHV_-26" value="if still have company" style="rhombus;whiteSpace=wrap;html=1;sketch=1;curveFitting=1;jiggle=2;" parent="1" vertex="1">
+          <mxGeometry x="770" y="270" width="110" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="ee3Hf3BzdbRgXfLqMHV_-33" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;sketch=1;curveFitting=1;jiggle=2;" parent="1" source="ee3Hf3BzdbRgXfLqMHV_-31" target="ee3Hf3BzdbRgXfLqMHV_-32" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="ee3Hf3BzdbRgXfLqMHV_-31" value="Request the crawler to refresh the list of publicly traded company ticker symbols" style="ellipse;whiteSpace=wrap;html=1;sketch=1;curveFitting=1;jiggle=2;" parent="1" vertex="1">
+          <mxGeometry x="700" y="40" width="200" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="ee3Hf3BzdbRgXfLqMHV_-34" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;sketch=1;curveFitting=1;jiggle=2;" parent="1" source="ee3Hf3BzdbRgXfLqMHV_-32" target="ee3Hf3BzdbRgXfLqMHV_-10" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="ee3Hf3BzdbRgXfLqMHV_-32" value="Get the latest defined version for each report" style="rounded=0;whiteSpace=wrap;html=1;sketch=1;curveFitting=1;jiggle=2;" parent="1" vertex="1">
+          <mxGeometry x="460" y="50" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="oFhDvv9RlIDCHvoSyQMo-20" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;sketch=1;curveFitting=1;jiggle=2;" edge="1" parent="1" source="ee3Hf3BzdbRgXfLqMHV_-35" target="oFhDvv9RlIDCHvoSyQMo-2">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="ee3Hf3BzdbRgXfLqMHV_-35" value="for each season (go backward) from two season ago" style="rounded=0;whiteSpace=wrap;html=1;sketch=1;curveFitting=1;jiggle=2;" parent="1" vertex="1">
+          <mxGeometry x="765" y="390" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="oFhDvv9RlIDCHvoSyQMo-21" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=0.75;entryY=0;entryDx=0;entryDy=0;sketch=1;curveFitting=1;jiggle=2;" edge="1" parent="1" source="oFhDvv9RlIDCHvoSyQMo-2" target="oFhDvv9RlIDCHvoSyQMo-4">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="oFhDvv9RlIDCHvoSyQMo-22" value="No" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];sketch=1;curveFitting=1;jiggle=2;" vertex="1" connectable="0" parent="oFhDvv9RlIDCHvoSyQMo-21">
+          <mxGeometry x="-0.8571" y="-1" relative="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="oFhDvv9RlIDCHvoSyQMo-31" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;sketch=1;curveFitting=1;jiggle=2;" edge="1" parent="1" source="oFhDvv9RlIDCHvoSyQMo-2">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="885" y="210" as="targetPoint" />
+            <Array as="points">
+              <mxPoint x="995" y="520" />
+              <mxPoint x="995" y="210" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="oFhDvv9RlIDCHvoSyQMo-2" value="if the local table indicate the version of this season is &quot;NDF&quot; (No Data Found)" style="rhombus;whiteSpace=wrap;html=1;sketch=1;curveFitting=1;jiggle=2;" vertex="1" parent="1">
+          <mxGeometry x="730" y="480" width="190" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="oFhDvv9RlIDCHvoSyQMo-24" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.75;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;sketch=1;curveFitting=1;jiggle=2;" edge="1" parent="1" source="oFhDvv9RlIDCHvoSyQMo-4" target="oFhDvv9RlIDCHvoSyQMo-23">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="oFhDvv9RlIDCHvoSyQMo-26" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.25;exitY=1;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;sketch=1;curveFitting=1;jiggle=2;" edge="1" parent="1" source="oFhDvv9RlIDCHvoSyQMo-4" target="ee3Hf3BzdbRgXfLqMHV_-14">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="oFhDvv9RlIDCHvoSyQMo-4" value="Retrieve Data" style="swimlane;horizontal=0;whiteSpace=wrap;html=1;sketch=1;curveFitting=1;jiggle=2;" vertex="1" parent="1">
+          <mxGeometry x="330" y="380" width="330" height="340" as="geometry" />
+        </mxCell>
+        <mxCell id="oFhDvv9RlIDCHvoSyQMo-5" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;sketch=1;curveFitting=1;jiggle=2;" edge="1" parent="oFhDvv9RlIDCHvoSyQMo-4" source="ee3Hf3BzdbRgXfLqMHV_-8" target="oFhDvv9RlIDCHvoSyQMo-3">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="ee3Hf3BzdbRgXfLqMHV_-8" value="Attempt to retrieve the financial report of this season" style="rounded=0;whiteSpace=wrap;html=1;sketch=1;curveFitting=1;jiggle=2;" parent="oFhDvv9RlIDCHvoSyQMo-4" vertex="1">
+          <mxGeometry x="135" y="156" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="oFhDvv9RlIDCHvoSyQMo-6" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;sketch=1;curveFitting=1;jiggle=2;" edge="1" parent="oFhDvv9RlIDCHvoSyQMo-4" source="ee3Hf3BzdbRgXfLqMHV_-36" target="ee3Hf3BzdbRgXfLqMHV_-8">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="oFhDvv9RlIDCHvoSyQMo-10" value="No" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];sketch=1;curveFitting=1;jiggle=2;" vertex="1" connectable="0" parent="oFhDvv9RlIDCHvoSyQMo-6">
+          <mxGeometry x="-0.3188" y="-1" relative="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="oFhDvv9RlIDCHvoSyQMo-7" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;sketch=1;curveFitting=1;jiggle=2;" edge="1" parent="oFhDvv9RlIDCHvoSyQMo-4" source="ee3Hf3BzdbRgXfLqMHV_-36" target="oFhDvv9RlIDCHvoSyQMo-4">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="60" y="86" />
+              <mxPoint x="60" y="316" />
+              <mxPoint x="165" y="316" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="oFhDvv9RlIDCHvoSyQMo-12" value="Yes" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];sketch=1;curveFitting=1;jiggle=2;" vertex="1" connectable="0" parent="oFhDvv9RlIDCHvoSyQMo-7">
+          <mxGeometry x="-0.8066" y="1" relative="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="ee3Hf3BzdbRgXfLqMHV_-36" value="if the version of financial report for this season in the table is euqal to the latest defined version" style="rhombus;whiteSpace=wrap;html=1;sketch=1;curveFitting=1;jiggle=2;" parent="oFhDvv9RlIDCHvoSyQMo-4" vertex="1">
+          <mxGeometry x="80" y="46" width="230" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="oFhDvv9RlIDCHvoSyQMo-8" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;sketch=1;curveFitting=1;jiggle=2;" edge="1" parent="oFhDvv9RlIDCHvoSyQMo-4" source="oFhDvv9RlIDCHvoSyQMo-3" target="oFhDvv9RlIDCHvoSyQMo-4">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="195" y="316" />
+              <mxPoint x="165" y="316" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="oFhDvv9RlIDCHvoSyQMo-3" value="Update local version table information" style="rounded=0;whiteSpace=wrap;html=1;sketch=1;curveFitting=1;jiggle=2;" vertex="1" parent="oFhDvv9RlIDCHvoSyQMo-4">
+          <mxGeometry x="135" y="236" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="oFhDvv9RlIDCHvoSyQMo-9" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;sketch=1;curveFitting=1;jiggle=2;" edge="1" parent="oFhDvv9RlIDCHvoSyQMo-4" source="oFhDvv9RlIDCHvoSyQMo-4" target="ee3Hf3BzdbRgXfLqMHV_-36">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="165" y="16" />
+              <mxPoint x="195" y="16" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="oFhDvv9RlIDCHvoSyQMo-30" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;sketch=1;curveFitting=1;jiggle=2;" edge="1" parent="1" source="oFhDvv9RlIDCHvoSyQMo-23" target="ee3Hf3BzdbRgXfLqMHV_-24">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="995" y="660" />
+              <mxPoint x="995" y="210" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="oFhDvv9RlIDCHvoSyQMo-23" value="if the local table indicate the version of this season is &quot;NDF&quot; (No Data Found)" style="rhombus;whiteSpace=wrap;html=1;sketch=1;curveFitting=1;jiggle=2;" vertex="1" parent="1">
+          <mxGeometry x="730" y="620" width="190" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="oFhDvv9RlIDCHvoSyQMo-28" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;jumpStyle=arc;jumpSize=10;sketch=1;curveFitting=1;jiggle=2;" edge="1" parent="1" source="oFhDvv9RlIDCHvoSyQMo-23" target="ee3Hf3BzdbRgXfLqMHV_-35">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="825" y="720" />
+              <mxPoint x="945" y="720" />
+              <mxPoint x="945" y="420" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="oFhDvv9RlIDCHvoSyQMo-29" value="No" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];sketch=1;curveFitting=1;jiggle=2;" vertex="1" connectable="0" parent="oFhDvv9RlIDCHvoSyQMo-28">
+          <mxGeometry x="-0.9496" y="-3" relative="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="oFhDvv9RlIDCHvoSyQMo-37" value="End" style="ellipse;whiteSpace=wrap;html=1;aspect=fixed;sketch=1;curveFitting=1;jiggle=2;" vertex="1" parent="1">
+          <mxGeometry x="1025" y="285" width="50" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="oFhDvv9RlIDCHvoSyQMo-35" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;jumpStyle=arc;jumpSize=10;sketch=1;curveFitting=1;jiggle=2;" edge="1" parent="1" source="ee3Hf3BzdbRgXfLqMHV_-26" target="oFhDvv9RlIDCHvoSyQMo-37">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="1025" y="310.52941176470586" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="oFhDvv9RlIDCHvoSyQMo-36" value="No" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];sketch=1;curveFitting=1;jiggle=2;" vertex="1" connectable="0" parent="oFhDvv9RlIDCHvoSyQMo-35">
+          <mxGeometry x="-0.6872" relative="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
