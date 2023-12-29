@@ -1,0 +1,14 @@
+[tool.poetry]
+name = "telegram-bot"
+version = "0.1.0"
+description = "The front-end of TradeWiSE as a Telegram bot."
+authors = ["wildfootw <wildfootw@wildfoo.tw>", "soyccan <soyccan@gmail.com>"]
+
+[tool.poetry.dependencies]
+python = "^3.11"
+python-telegram-bot = "^20.7"
+requests = "^2.31.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
