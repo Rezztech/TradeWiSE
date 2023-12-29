@@ -50,11 +50,11 @@ def rate_limited(func):
         return func(*args, **kwargs)
     return wrapped
 
-limiter = RateLimiter(calls_per_second=1)
+limiter = RateLimiter(calls_per_second=0.1)
 app = FastAPI()
 
 @rate_limited
-def crawl_financial_report(ticker_symbol, year, season, report_type):
+def crawl_financial_report(ticker_symbol, report_type, year, season):
     # URLs for different types of financial reports
     report_urls = {
         "balance_sheet":    "https://mops.twse.com.tw/mops/web/ajax_t164sb03",
@@ -86,7 +86,7 @@ def crawl_financial_report(ticker_symbol, year, season, report_type):
 
         if "查無所需資料！" in response.text:
             logging.info("No data found for the given parameters.")
-            return {"status_code": 404, "message": "No Data Found"}
+            return {"status_code": 200, "data": {version: "NDF"}}
 
         return {"status_code": 200, "data": response.text}
 
@@ -94,7 +94,7 @@ def crawl_financial_report(ticker_symbol, year, season, report_type):
         logging.error(f"Request error: {e}")
         return {"status_code": 500, "message": "Internal Server Error"}
 
-def sanitize_balance_sheet(response_text, year, season):
+def sanitize_balance_sheet(year, season, response_text):
     try:
         html_dataframe = pandas.read_html(StringIO(response_text))[1].fillna("")
 
@@ -126,22 +126,8 @@ def sanitize_balance_sheet(response_text, year, season):
         logging.error(f"Unexpected error in data extraction: {e}")
         return {"status_code": 500, "message": "Unknown error occurred in data extraction"}
 
-# Store data into database
-def store_data(ticker_symbol, year, season, report_type, data):
-    # Base URL for the database API
-    base_url = 'http://database-api/'
-
-    # Define the URL based on report_type
-    if report_type == "balance_sheet":
-        url = f'{base_url}balance_sheet/'
-    elif report_type == "income_statement":
-        url = f'{base_url}income_statement/'
-    elif report_type == "cash_flow":
-        url = f'{base_url}cash_flow/'
-    else:
-        logging.error(f"Invalid report type: {report_type}")
-        return {"status_code": 400, "message": "Invalid report type"}
-
+# Function to generate the POST data
+def generate_post_data(ticker_symbol, year, season, data):
     # Construct the POST data
     post_data = {
         "ticker_symbol": ticker_symbol,
@@ -149,64 +135,51 @@ def store_data(ticker_symbol, year, season, report_type, data):
         "reporting_season": season,
     }
     post_data.update(data)  # Add the financial report data
+    if "version" not in post_data:
+        post_data["version"] = "v1"
+    return post_data
 
-    try:
-        response = requests.post(url, json=post_data)
-
-        if response.status_code == 200:
-            logging.info("Data successfully stored in database")
-            return {"status_code": 200, "message": "Data stored successfully"}
-        else:
-            logging.error(f"Failed to store data in database. Status code: {response.status_code}, Response: {response.text}")
-            return {"status_code": response.status_code, "message": "Failed to store data in database"}
-
-    except requests.RequestException as e:
-        logging.error(f"Request error when storing data: {e}")
-        return {"status_code": 500, "message": "Internal Server Error"}
+def sanitize_report(report_type, year, season, response_text):
+    if report_type == "balance_sheet":
+        return sanitize_balance_sheet(year, season, response_text)
+    elif report_type == "income_statement":
+        # return sanitize_income_statement(response_text, year, season)
+        pass
+    elif report_type == "cash_flow":
+        # return sanitize_cash_flow(response_text, year, season)
+        pass
 
 # Function to process each report
-def process_report(ticker_symbol, year, season, report_type):
+def process_report(ticker_symbol, report_type, year, season):
     logging.info(f"Processing report for ticker {ticker_symbol}, year: {year}, season: {season}, type: {report_type}")
 
     # Retrieve the financial report data
-    report_result = crawl_financial_report(ticker_symbol, year, season, report_type)
+    report_result = crawl_financial_report(ticker_symbol, report_type, year, season)
+    if report_result.get("status_code") != 200:
+        return report_result  # This will contain the status_code and message from crawl_financial_report
 
-    # Check if data is available
-    if report_result.get("data"):
-        sanitized_report = None
-        if report_type == "balance_sheet":
-            sanitized_report = sanitize_balance_sheet(report_result["data"], year, season)
-        elif report_type == "income_statement":
-            # Place logic here for income statement extraction
-            pass
-        elif report_type == "cash_flow":
-            # Place logic here for cash flow extraction
-            pass
-        logging.info(f"Completed data extraction for {ticker_symbol}, year: {year}, season: {season}")
+    sanitized_report = sanitize_report(report_type, year, season, report_result["data"])
+    if sanitized_report.get("status_code") != 200:
+        return sanitized_report  # This will contain the status_code and message from sanitize_report
 
-        if sanitized_report:
-            store_data(ticker_symbol, year, season, report_type, sanitized_report)
-            return {"status_code": 200, "message": "Data processed and stored successfully"}
+    # Generate POST data with the sanitized report data
+    post_data = generate_post_data(ticker_symbol, year, season, sanitized_report["data"])
 
-    return {"status_code": report_result.get("status_code", 500), "message": report_result.get("message", "Error")}
+    logging.info(f"Completed data extraction for {ticker_symbol}, year: {year}, season: {season}")
+    return {"status_code": 200, "message": "Success", "data": post_data}
 
+@app.get("/{ticker_symbol}/{report_type}/{year}/{season}")
+def get_financial_report(report_type: str, ticker_symbol: str, year: int, season: int):
+    # Ensure that report_type is one of the expected types
+    if report_type not in ["balance_sheet", "income_statement", "cash_flow"]:
+        raise HTTPException(status_code=400, detail="Invalid report type specified")
 
-class ReportRequest(BaseModel):
-    ticker_symbol: str
-    year: int
-    season: int
+    # Call the process_report function with the path parameters
+    result = process_report(ticker_symbol, report_type, year, season)
 
-@app.post("/balance_sheet/")
-def get_balance_sheet(request: ReportRequest):
-    result = process_report(request.ticker_symbol, request.year, request.season, "balance_sheet")
-    return {"status_code": result["status_code"], "message": result["message"]}
+    # If process_report returned an error status code, raise an HTTPException
+    if result["status_code"] != 200:
+        raise HTTPException(status_code=result["status_code"], detail=result["message"])
 
-@app.post("/income_statement/")
-def get_income_statement(request: ReportRequest):
-    result = process_report(request.ticker_symbol, request.year, request.season, "income_statement")
-    return {"status_code": result["status_code"], "message": result["message"]}
-
-@app.post("/cash_flow/")
-def get_cash_flow(request: ReportRequest):
-    result = process_report(request.ticker_symbol, request.year, request.season, "cash_flow")
-    return {"status_code": result["status_code"], "message": result["message"]}
+    # If everything went well, return the sanitized data
+    return result["data"]

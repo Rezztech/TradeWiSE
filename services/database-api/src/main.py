@@ -21,7 +21,7 @@ import json
 import os
 
 # Pydantic model for balance sheet request validation
-class BalanceSheetRequest(BaseModel):
+class ReportRequest(BaseModel):
     version: str
     ticker_symbol: str
     reporting_year: int
@@ -43,40 +43,37 @@ db = client[MONGO_DB]
 def read_root():
     return {"Hello": "World"}
 
-@app.post("/balance_sheet/")
-async def create_balance_sheet(balance_sheet_request: BalanceSheetRequest):
-    collection = db.balance_sheets
-    existing_sheet = collection.find_one({
-        "ticker_symbol": balance_sheet_request.ticker_symbol,
-        "reporting_year": balance_sheet_request.reporting_year,
-        "reporting_season": balance_sheet_request.reporting_season
+@app.post("/create_report/{report_type}/")
+async def create_report(report_type: str, report_request: ReportRequest):
+    collection = db[report_type]  # Use report_type to select the appropriate collection
+    existing_report = collection.find_one({
+        "ticker_symbol": report_request.ticker_symbol,
+        "reporting_year": report_request.reporting_year,
+        "reporting_season": report_request.reporting_season
     })
 
-    if existing_sheet:
+    if existing_report:
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT,
-            detail="Balance sheet already exists"
+            detail=f"{report_type.capitalize()} report already exists"
         )
 
-    # Convert Pydantic model to dictionary for MongoDB insertion
-    balance_sheet_data = balance_sheet_request.dict()
-    collection.insert_one(balance_sheet_data)
-    return {"message": "Balance sheet created"}
+    report_data = report_request.dict()
+    collection.insert_one(report_data)
+    return {"message": f"{report_type.capitalize()} report created"}
 
-@app.get("/balance_sheet/{ticker_symbol}/{year}/{season}")
-async def get_balance_sheet(ticker_symbol: str, year: int, season: int):
-    collection = db.balance_sheets
-    balance_sheet = collection.find_one({"ticker_symbol": ticker_symbol, "reporting_year": year, "reporting_season": season})
-    if balance_sheet:
-        # Serialize MongoDB document using the custom JSON Encoder
-        return json.loads(json.dumps(balance_sheet, cls=JSONEncoder))
-    raise HTTPException(status_code=404, detail="Balance sheet not found")
+@app.get("/{ticker_symbol}/{report_type}/{year}/{season}")
+async def get_report(ticker_symbol: str, report_type: str, year: int, season: int):
+    collection = db[report_type]
+    report = collection.find_one({"ticker_symbol": ticker_symbol, "reporting_year": year, "reporting_season": season})
+    if report:
+        return json.loads(json.dumps(report, cls=JSONEncoder))
+    raise HTTPException(status_code=404, detail=f"{report_type.capitalize()} report not found")
 
-@app.delete("/balance_sheet/{ticker_symbol}/{year}/{season}")
-async def delete_balance_sheet(ticker_symbol: str, year: int, season: int):
-    collection = db.balance_sheets
+@app.delete("/{ticker_symbol}/{report_type}/{year}/{season}")
+async def delete_report(ticker_symbol: str, report_type: str, year: int, season: int):
+    collection = db[report_type]
     result = collection.delete_one({"ticker_symbol": ticker_symbol, "reporting_year": year, "reporting_season": season})
     if result.deleted_count:
-        return {"message": "Balance sheet deleted"}
-    raise HTTPException(status_code=404, detail="Balance sheet not found")
-
+        return {"message": f"{report_type.capitalize()} report deleted"}
+    raise HTTPException(status_code=404, detail=f"{report_type.capitalize()} report not found")
