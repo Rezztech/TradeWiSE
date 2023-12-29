@@ -14,10 +14,11 @@
 #
 
 import logging
+import os
+
+import requests
 from telegram import Update
 from telegram.ext import ApplicationBuilder, CommandHandler, ContextTypes
-import requests
-import os
 
 telegram_bot_token = os.getenv('TELEGRAM_BOT_TOKEN')
 telegram_bot_auth_user_id = os.getenv('TELEGRAM_BOT_AUTH_USER_ID')
