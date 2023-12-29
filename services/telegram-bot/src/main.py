@@ -14,6 +14,7 @@
 #
 from __future__ import annotations
 
+import json
 import logging
 import os
 from typing import TYPE_CHECKING, cast
@@ -73,16 +74,16 @@ class StockCommand(_BaseCommand):
             await update.message.reply_text("Please provide a stock symbol. Usage: /stock <symbol>")
             return
         symbol = args[0]
-        data = await StockCommand.get_stock_price(symbol)
-        await update.message.reply_text(str(data))
+        data = StockCommand.get_stock_price(symbol)
+        await update.message.reply_text(data)
 
     @staticmethod
-    async def get_stock_price(symbol: str):
+    def get_stock_price(symbol: str) -> str:
         response = requests.get(f'http://fugle-market-data:80/price/{symbol}')
         if response.status_code == 200:
-            return response.json()
+            return response.text
         else:
-            return {'error': 'Unable to fetch data'}
+            return json.dumps({'error': f'Unable to fetch data: {response.text}'})
 
 _commands: list[_BaseCommand] = [StartCommand(), StockCommand()]
 
@@ -95,6 +96,7 @@ async def is_user_authorized(update: Update, context: ContextTypes.DEFAULT_TYPE)
     return True
 
 async def post_init(application: Application) -> None:
+    # Set bot commands so that they are shown in the bot menu
     await cast(Bot, application.bot).set_my_commands(
         [cmd.to_bot_command() for cmd in _commands]
     )
