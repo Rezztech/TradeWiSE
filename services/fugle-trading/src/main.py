@@ -50,6 +50,7 @@ logging.basicConfig(
 
 class FugleTrading:
     _singleton: FugleTrading | None = None
+    _initailized: bool = False
 
     sdk: SDK
 
@@ -66,9 +67,17 @@ class FugleTrading:
         account_password: str = fugle_trading_account_password,
         cert_password: str = fugle_trading_cert_password,
     ) -> None:
+        if type(self)._initailized:
+            return
+        type(self)._initailized = True
+
         config = ConfigParser()
         if not config.read(config_path):
             raise FileNotFoundError(f'Failed to read "{config_path}"')
+        # Resolve relative paths
+        config["Cert"]["Path"] = str(
+            Path(config_path).parent.joinpath(config["Cert"]["Path"]).resolve()
+        )
 
         self.setup_crypt_file_keyring(keyring_key)
         keyring.set_password("fugle_trade_sdk:account", config["User"]["Account"], account_password)
@@ -110,5 +119,6 @@ async def place_order(fugle_trading: Annotated[FugleTrading, Depends(FugleTradin
         ap_code = APCode.Common
     )
     sdk = fugle_trading.sdk
+    _logger.info("Placing order")
     sdk.place_order(order)
     print(sdk.get_order_results())

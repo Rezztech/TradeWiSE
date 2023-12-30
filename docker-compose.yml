@@ -29,10 +29,9 @@ services:
     env_file:
       - ./config/.env
     environment:
-      - FUGLE_TRADING_CONFIG=config.ini
+      - FUGLE_TRADING_CONFIG=/app/fugle-trading/config.simulation.ini
     volumes:
-      - ./config/config.fugletrading.ini:/app/config.ini
-      - ./config/cert.p12:/app/cert.p12
+      - ./config/fugle-trading:/app/fugle-trading
     networks:
       - tradewise-net
 
