@@ -26,6 +26,10 @@ services:
   fugle-trading:
     build: ./services/fugle-trading
     restart: always
+    env_file:
+      - ./config/.env
+    environment:
+      - FUGLE_TRADING_CONFIG=config.ini
     volumes:
       - ./config/config.fugletrading.ini:/app/config.ini
       - ./config/cert.p12:/app/cert.p12
