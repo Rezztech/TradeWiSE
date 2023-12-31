@@ -17,15 +17,16 @@ from __future__ import annotations
 import logging
 import os
 from configparser import ConfigParser
+from enum import Enum
 from pathlib import Path
-from typing import Annotated
 
+import fugle_trade.constant
+import fugle_trade.order
 import keyring
-from fastapi import Body, FastAPI
-from fugle_trade.constant import Action, APCode, BSFlag, PriceFlag, Trade
-from fugle_trade.order import OrderObject
+from fastapi import FastAPI
 from fugle_trade.sdk import SDK
 from keyrings.cryptfile.cryptfile import CryptFileKeyring
+from pydantic import BaseModel
 
 
 def get_env_or_raise(name: str) -> str:
@@ -109,34 +110,134 @@ class FugleTrading:
         # set as the global keyring
         keyring.set_keyring(kr)
 
+class Action(str, Enum):
+    BUY = "buy"
+    SELL = "sell"
+
+    def to_fugle(self) -> fugle_trade.constant.Action:
+        return {
+            self.BUY: fugle_trade.constant.Action.Buy,
+            self.SELL: fugle_trade.constant.Action.Sell
+        }[self]
+
+class Market(str, Enum):
+    COMMON = "common"
+    """整股"""
+
+    AFTER_MARKET = "afterMarket"
+    """盤後"""
+
+    ODD = "odd"
+    """盤後零股"""
+
+    EMG = "emerging"
+    """興櫃"""
+
+    INTRADAY_ODD = "intradayOdd"
+    """盤中零股"""
+
+    def to_fugle(self) -> fugle_trade.constant.APCode:
+        return {
+            self.COMMON: fugle_trade.constant.APCode.Common,
+            self.AFTER_MARKET: fugle_trade.constant.APCode.AfterMarket,
+            self.ODD: fugle_trade.constant.APCode.Odd,
+            self.EMG: fugle_trade.constant.APCode.Emg,
+            self.INTRADAY_ODD: fugle_trade.constant.APCode.IntradayOdd,
+        }[self]
+
+class ActionFlag(str, Enum):
+    ROD = "ROD"
+    """Rest of Day"""
+
+    IOC = "IOC"
+    """Immediate or cancel"""
+
+    FOK = "FOK"
+    """Fill or kill"""
+
+    def to_fugle(self) -> fugle_trade.constant.BSFlag:
+        return {
+            self.ROD: fugle_trade.constant.BSFlag.ROD,
+            self.IOC: fugle_trade.constant.BSFlag.IOC,
+            self.FOK: fugle_trade.constant.BSFlag.FOK,
+        }[self]
+
+class PriceFlag(str, Enum):
+    LIMIT = "limit"
+    """限價"""
+
+    FLAT = "flat"
+    """平盤"""
+
+    LIMIT_DOWN = "limitDown"
+    """跌停"""
+
+    LIMIT_UP = "limitUp"
+    """漲停"""
+
+    MARKET = "market"
+    """市價"""
+
+    def to_fugle(self) -> fugle_trade.constant.PriceFlag:
+        return {
+            self.LIMIT: fugle_trade.constant.PriceFlag.Limit,
+            self.FLAT: fugle_trade.constant.PriceFlag.Flat,
+            self.LIMIT_DOWN: fugle_trade.constant.PriceFlag.LimitDown,
+            self.LIMIT_UP: fugle_trade.constant.PriceFlag.LimitUp,
+            self.MARKET: fugle_trade.constant.PriceFlag.Market,
+        }[self]
+
+class TradeType(str, Enum):
+    CASH = "cash"
+    """現股"""
+
+    MARGIN = "margin"
+    """融資"""
+
+    SHORT_SELL = "shortSell"
+    """融券"""
+
+    DAY_TRADING_SELL = "dayTradingSell"
+    """現股當沖賣"""
+
+    def to_fugle(self) -> fugle_trade.constant.Trade:
+        return {
+            self.CASH: fugle_trade.constant.Trade.Cash,
+            self.MARGIN: fugle_trade.constant.Trade.Margin,
+            self.SHORT_SELL: fugle_trade.constant.Trade.Short,
+            self.DAY_TRADING_SELL: fugle_trade.constant.Trade.DayTradingSell,
+        }[self]
+
+class Order(BaseModel):
+    action: Action
+    price: float
+    stock_no: str
+    quantity: int
+    market: Market = Market.COMMON
+    action_flag: ActionFlag = ActionFlag.ROD
+    price_flag: PriceFlag = PriceFlag.LIMIT
+    trade_type: TradeType = TradeType.CASH
+
+    def to_fugle(self) -> fugle_trade.order.OrderObject:
+        return fugle_trade.order.OrderObject(
+            buy_sell=self.action.to_fugle(),
+            price=self.price,
+            stock_no=self.stock_no,
+            quantity=self.quantity,
+            ap_code=self.market.to_fugle(),
+            bs_flag=self.action_flag.to_fugle(),
+            price_flag=self.price_flag.to_fugle(),
+            trade=self.trade_type.to_fugle(),
+        )
+
 
 # --- FastAPI server ---
 
 app = FastAPI()
 
 @app.post("/place_order")
-async def place_order(
-    buy_sell: Annotated[Action, Body()],
-    price: Annotated[float, Body()],
-    stock_no: Annotated[str, Body()],
-    quantity: Annotated[int, Body()],
-    ap_code: Annotated[APCode, Body()] = APCode.Common,
-    bs_flag: Annotated[BSFlag, Body()] = BSFlag.ROD,
-    price_flag: Annotated[PriceFlag, Body()] = PriceFlag.Limit,
-    trade: Annotated[Trade, Body()] = Trade.Cash,
-):
+async def place_order(order: Order):
     try:
-        return FugleTrading.sdk.place_order(
-            OrderObject(
-                buy_sell=buy_sell,
-                price=price,
-                stock_no=stock_no,
-                quantity=quantity,
-                ap_code=ap_code,
-                bs_flag=bs_flag,
-                price_flag=price_flag,
-                trade=trade,
-            )
-        )
+        return FugleTrading.sdk.place_order(order.to_fugle())
     except (ValueError, TypeError) as e:
         return {"error": str(e)}
