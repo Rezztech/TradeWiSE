@@ -21,8 +21,8 @@ from pathlib import Path
 from typing import Annotated
 
 import keyring
-from fastapi import Depends, FastAPI
-from fugle_trade.constant import Action, APCode
+from fastapi import Body, FastAPI
+from fugle_trade.constant import Action, APCode, BSFlag, PriceFlag, Trade
 from fugle_trade.order import OrderObject
 from fugle_trade.sdk import SDK
 from keyrings.cryptfile.cryptfile import CryptFileKeyring
@@ -52,7 +52,12 @@ class FugleTrading:
     _singleton: FugleTrading | None = None
     _initailized: bool = False
 
-    sdk: SDK
+    _sdk: SDK
+
+    @classmethod
+    @property
+    def sdk(cls) -> SDK:
+        return cls()._sdk
 
     def __new__(cls) -> FugleTrading:
         if cls._singleton is None:
@@ -83,8 +88,8 @@ class FugleTrading:
         keyring.set_password("fugle_trade_sdk:account", config["User"]["Account"], account_password)
         keyring.set_password("fugle_trade_sdk:cert", config["User"]["Account"], cert_password)
 
-        self.sdk = SDK(config)
-        self.sdk.login()
+        self._sdk = SDK(config)
+        self._sdk.login()
 
     @staticmethod
     def setup_crypt_file_keyring(keyring_key: str):
@@ -109,16 +114,29 @@ class FugleTrading:
 
 app = FastAPI()
 
-@app.get("/")
-async def place_order(fugle_trading: Annotated[FugleTrading, Depends(FugleTrading)]):
-    order = OrderObject(
-        buy_sell = Action.Buy,
-        price = 28.00,
-        stock_no = "2884",
-        quantity = 2,
-        ap_code = APCode.Common
-    )
-    sdk = fugle_trading.sdk
-    _logger.info("Placing order")
-    sdk.place_order(order)
-    print(sdk.get_order_results())
+@app.post("/place_order")
+async def place_order(
+    buy_sell: Annotated[Action, Body()],
+    price: Annotated[float, Body()],
+    stock_no: Annotated[str, Body()],
+    quantity: Annotated[int, Body()],
+    ap_code: Annotated[APCode, Body()] = APCode.Common,
+    bs_flag: Annotated[BSFlag, Body()] = BSFlag.ROD,
+    price_flag: Annotated[PriceFlag, Body()] = PriceFlag.Limit,
+    trade: Annotated[Trade, Body()] = Trade.Cash,
+):
+    try:
+        return FugleTrading.sdk.place_order(
+            OrderObject(
+                buy_sell=buy_sell,
+                price=price,
+                stock_no=stock_no,
+                quantity=quantity,
+                ap_code=ap_code,
+                bs_flag=bs_flag,
+                price_flag=price_flag,
+                trade=trade,
+            )
+        )
+    except (ValueError, TypeError) as e:
+        return {"error": str(e)}
