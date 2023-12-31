@@ -168,6 +168,10 @@ def process_report(ticker_symbol, report_type, year, season):
     logging.info(f"Completed data extraction for {ticker_symbol}, year: {year}, season: {season}")
     return {"status_code": 200, "message": "Success", "data": post_data}
 
+@app.get("/health")
+def health_check():
+    return {"Hello": "World"}
+
 @app.get("/{ticker_symbol}/{report_type}/{year}/{season}")
 def get_financial_report(report_type: str, ticker_symbol: str, year: int, season: int):
     # Ensure that report_type is one of the expected types

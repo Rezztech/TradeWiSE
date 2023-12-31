@@ -38,9 +38,8 @@ MONGO_DB = os.getenv("MONGO_DATABASE")
 client = MongoClient(f"mongodb://{MONGO_USER}:{MONGO_PASSWORD}@database:27017/")
 db = client[MONGO_DB]
 
-# API logic
-@app.get("/")
-def read_root():
+@app.get("/health")
+def health_check():
     return {"Hello": "World"}
 
 @app.post("/create_report/{report_type}/")

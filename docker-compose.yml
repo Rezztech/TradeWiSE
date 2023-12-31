@@ -18,12 +18,22 @@ services:
       - tradewise-net
     volumes:
       - ./services/mops-crawler/src:/app # Bind mount for live development
+    healthcheck:
+      test: ["CMD-SHELL", "python -c \"import http.client; conn = http.client.HTTPConnection('localhost', 80); conn.request('GET', '/health'); response = conn.getresponse(); assert response.status == 200\""]
+      interval: 10s
+      timeout: 6s
+      retries: 5
 
   report-harvester:
     build: ./services/report-harvester
     restart: always
     networks:
       - tradewise-net
+    depends_on:
+      database-api:
+        condition: service_healthy
+      mops-crawler:
+        condition: service_healthy
     volumes:
       - ./services/report-harvester/src:/app # Bind mount for live development
 
@@ -92,6 +102,11 @@ services:
       - database
     volumes:
       - ./services/database-api/src:/app # Bind mount for live development
+    healthcheck:
+      test: ["CMD-SHELL", "python -c \"import http.client; conn = http.client.HTTPConnection('localhost', 80); conn.request('GET', '/health'); response = conn.getresponse(); assert response.status == 200\""]
+      interval: 10s
+      timeout: 6s
+      retries: 5
 
 networks:
   tradewise-net:
