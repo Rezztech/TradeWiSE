@@ -64,7 +64,7 @@ def get_past_season(seasons_back):
     if past_year <= 0:
         raise ValueError("Error: The calculated year is less than or equal to 0.")
 
-    return past_year, past_season
+    return str(past_year), str(past_season)
 
 def store_financial_report(report_type, post_data):
     # Base URL for the database API
@@ -101,12 +101,25 @@ def retrieve_ticker_symbols():
     return ["2330", "2331"]
 
 def retrieve_financial_report_version_table(ticker_symbol, report_type):
-    # [TODO] Implement logic to retrieve the company's report version information
-    if ticker_symbol == "2330":
-        return { "112": { "1": "v1", "2": "v1", "3": "v1"}, "111": { "1": "NDF"}}
-    elif ticker_symbol == "2331":
-        return {}
+    base_url = "http://database-api"
+    url = f"{base_url}/{ticker_symbol}/{report_type}/version_table"
 
+    try:
+        response = requests.get(url)
+        response.raise_for_status()
+
+        # Assuming the API returns a JSON response
+        version_table = response.json()
+        return version_table
+
+    # Handle HTTP errors (e.g., response code 4XX or 5XX)
+    except HTTPError as http_err:
+        logging.error(f"HTTP error occurred while retrieving report version table: {http_err}")
+        raise
+    # Handle other errors
+    except Exception as err:
+        logging.error(f"Error occurred while retrieving report version table: {err}")
+        raise
 
 def retrieve_financial_report(ticker_symbol, report_type, year, season):
     base_url = "http://mops-crawler"
@@ -172,6 +185,7 @@ def update_financial_reports():
             # Get the version for the past_year and past_season, default to None if not found
             past_year, past_season = get_past_season(1) # Previous season
             past_version = report_version_table.get(past_year, {}).get(past_season, None)
+            logging.debug(f"Version for {ticker_symbol} {report_type} {past_year} {past_season}: {past_version}")
 
             if past_version != supported_version:
                 logging.debug(f"Version mismatch for {ticker_symbol} {report_type} {past_year} {past_season}")
@@ -180,7 +194,7 @@ def update_financial_reports():
                     store_result = store_financial_report(report_type, retrieve_result)
                     logging.debug(f"Stored financial report for {ticker_symbol} {report_type} {past_year} {past_season}")
                 elif retrieve_result["version"] == "NDF":
-                    logging.info("No data found for %s %s %s", ticker_symbol, report_type, past_year, past_season)
+                    logging.info("No data found for %s %s %s %s", ticker_symbol, report_type, past_year, past_season)
 
             # Continue retrieving and updating data from the preceding seasons until the version is "NDF"
             season_decrement = 2 # Preceding seasons
@@ -188,6 +202,7 @@ def update_financial_reports():
                 past_year, past_season = get_past_season(season_decrement)
                 season_decrement += 1
                 past_version = report_version_table.get(past_year, {}).get(past_season, None)
+                logging.debug(f"Version for {ticker_symbol} {report_type} {past_year} {past_season}: {past_version}")
 
                 # First check to minimize the crawler request if the version is already "NDF"
                 if past_version == "NDF":

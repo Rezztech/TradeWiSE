@@ -17,8 +17,13 @@ from fastapi import FastAPI, HTTPException, status
 from pymongo import MongoClient
 from utils.encoder import JSONEncoder
 from pydantic import BaseModel
+from typing import Dict
 import json
 import os
+import logging
+
+log_level = os.environ.get("LOG_LEVEL", "DEBUG").upper()
+logging.basicConfig(level=log_level, format="%(asctime)s - %(levelname)s - %(message)s")
 
 # Pydantic model for balance sheet request validation
 class ReportRequest(BaseModel):
@@ -37,6 +42,39 @@ MONGO_DB = os.getenv("MONGO_DATABASE")
 # MongoDB connection
 client = MongoClient(f"mongodb://{MONGO_USER}:{MONGO_PASSWORD}@database:27017/")
 db = client[MONGO_DB]
+
+def get_version_table(ticker_symbol: str, report_type: str) -> Dict:
+    collection = db[report_type]
+
+    # Query for all documents related to the specific ticker_symbol
+    query_result = collection.find({"ticker_symbol": ticker_symbol})
+
+    # Building the return dictionary
+    version_table = {}
+    for doc in query_result:
+        year = doc.get("reporting_year")
+        season = doc.get("reporting_season")
+        version = doc.get("version")
+
+        #logging.debug(f"Processing document: Year={year}, Season={season}, Version={version}")
+        # Ensure the year key exists in the version table
+        if year not in version_table:
+            version_table[year] = {}
+
+        # Add season and version information
+        version_table[year][season] = version
+
+    return version_table
+
+@app.get("/{ticker_symbol}/{report_type}/version_table")
+async def get_version_table_endpoint(ticker_symbol: str, report_type: str):
+    try:
+        reports = get_version_table(ticker_symbol, report_type)
+        return reports
+    except Exception as e:
+        logging.error(f"Error fetching version table: {e}", exc_info=True)
+        raise HTTPException(status_code=500, detail=f"An error occurred: {e}")
+
 
 @app.get("/health")
 def health_check():

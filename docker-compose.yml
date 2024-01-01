@@ -22,7 +22,7 @@ services:
       test: ["CMD-SHELL", "python -c \"import http.client; conn = http.client.HTTPConnection('localhost', 80); conn.request('GET', '/health'); response = conn.getresponse(); assert response.status == 200\""]
       interval: 10s
       timeout: 6s
-      retries: 5
+      retries: 3
 
   report-harvester:
     build: ./services/report-harvester
@@ -106,7 +106,7 @@ services:
       test: ["CMD-SHELL", "python -c \"import http.client; conn = http.client.HTTPConnection('localhost', 80); conn.request('GET', '/health'); response = conn.getresponse(); assert response.status == 200\""]
       interval: 10s
       timeout: 6s
-      retries: 5
+      retries: 3
 
 networks:
   tradewise-net:

@@ -84,10 +84,6 @@ def crawl_financial_report(ticker_symbol, report_type, year, season):
             logging.warning(f"Failed to retrieve data: Status code {response.status_code}")
             return {"status_code": response.status_code, "message": "Failed to retrieve data"}
 
-        if "查無所需資料！" in response.text:
-            logging.info("No data found for the given parameters.")
-            return {"status_code": 200, "data": {version: "NDF"}}
-
         return {"status_code": 200, "data": response.text}
 
     except requests.RequestException as e:
@@ -95,6 +91,10 @@ def crawl_financial_report(ticker_symbol, report_type, year, season):
         return {"status_code": 500, "message": "Internal Server Error"}
 
 def sanitize_balance_sheet(year, season, response_text):
+    if "查無所需資料！" in response_text:
+        logging.info("No data found for the given parameters.")
+        return {"status_code": 200, "data": {"version": "NDF"}}
+
     try:
         html_dataframe = pandas.read_html(StringIO(response_text))[1].fillna("")
 
