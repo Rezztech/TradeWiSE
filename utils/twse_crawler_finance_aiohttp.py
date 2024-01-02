@@ -63,33 +63,52 @@ async def crawl_financial_report(ticker_symbol, year, season, report_type):
         async with session.post(url, data=form_data, headers=headers) as response:
             logging.debug(f"Received response for {url}, status: {response.status}")
             if response.status != 200:
-                logging.error(f"Failed to retrieve data: Status code {response.status}")
-                return None
+                logging.warning(f"Failed to retrieve data: Status code {response.status}")
+                return {"data": None, "message": "Internal Server Error"}
             try:
                 text = await response.text()
-                html_dataframe = pandas.read_html(StringIO(text))[1].fillna("")
-                return html_dataframe
+                try:
+                    html_dataframe = pandas.read_html(StringIO(text))[1].fillna("")
+                    return {"data": html_dataframe, "message": "Data successfully retrieved"}
+                except ValueError:
+                    # Specific handling for no tables found in HTML
+                    if "查無所需資料！" in text:
+                        logging.info("No data found for the given parameters.")
+                        return {"data": None, "message": "No Data Found"}
+                    else:
+                        logging.warning("HTML parsed but contains no tables.")
+                        return {"data": None, "message": "Internal Server Error"}
             except Exception as e:
-                logging.error(f"Error occurred while parsing HTML: {e}")
-                return None
+                # Update this message to reflect other types of parsing errors
+                logging.warning(f"Unexpected error occurred during HTML parsing or DataFrame creation: {e}")
+                return {"data": None, "message": "Internal Server Error"}
 
 async def main():
     ticker_symbol = "2330"
-    year = 111
+    year = 83
     season = 4
     report_type = "balance_sheet"
-    logging.debug(f"Processing report for ticker {ticker_symbol}, year: {year}, season: {season}, type: {report_type}")
-    html_dataframe = await crawl_financial_report(ticker_symbol, year, season, report_type)
-    if html_dataframe is not None:
-        extracted_data = {}
+    logging.info(f"Processing report for ticker {ticker_symbol}, year: {year}, season: {season}, type: {report_type}")
+
+    # Retrieve the financial report data
+    report_result = await crawl_financial_report(ticker_symbol, year, season, report_type)
+
+    report_result_data = {}
+    # Check if data is available
+    if report_result["data"] is not None:
         if report_type == "balance_sheet":
-            extracted_data = await extract_balance_sheet(html_dataframe, year, season)
+            report_result_data = await extract_balance_sheet(report_result["data"], year, season)
         elif report_type == "income_statement":
+            # Place logic here for income statement extraction
             pass
         elif report_type == "cash_flow":
+            # Place logic here for cash flow extraction
             pass
-        logging.debug(f"Completed data extraction for {ticker_symbol}, year: {year}, season: {season}")
-        print(extracted_data)
+        logging.info(f"Completed data extraction for {ticker_symbol}, year: {year}, season: {season}")
+    else:
+        # Log the message if no data was found or an error occurred
+        report_result_data["message"] = report_result["message"]
+    print(report_result_data)
 
 if __name__ == "__main__":
     asyncio.run(main())

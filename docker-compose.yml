@@ -9,11 +9,27 @@ services:
     networks:
       - tradewise-net
 
-  twse-crawler:
-    build: ./services/twse-crawler
+  mops-crawler:
+    build: ./services/mops-crawler
     restart: always
     networks:
       - tradewise-net
+    healthcheck:
+      test: ["CMD-SHELL", "python -c \"import http.client; conn = http.client.HTTPConnection('localhost', 80); conn.request('GET', '/health'); response = conn.getresponse(); assert response.status == 200\""]
+      interval: 10s
+      timeout: 6s
+      retries: 3
+
+  report-harvester:
+    build: ./services/report-harvester
+    restart: always
+    networks:
+      - tradewise-net
+    depends_on:
+      database-api:
+        condition: service_healthy
+      mops-crawler:
+        condition: service_healthy
 
   fugle-market-data:
     build: ./services/fugle-market-data
@@ -69,6 +85,11 @@ services:
       - tradewise-net
     depends_on:
       - database
+    healthcheck:
+      test: ["CMD-SHELL", "python -c \"import http.client; conn = http.client.HTTPConnection('localhost', 80); conn.request('GET', '/health'); response = conn.getresponse(); assert response.status == 200\""]
+      interval: 10s
+      timeout: 6s
+      retries: 3
 
 networks:
   tradewise-net:

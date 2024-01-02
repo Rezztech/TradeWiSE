@@ -14,7 +14,12 @@
 #
 
 import json
+import logging
 import os
+from typing import Dict
+
+log_level = os.environ.get("LOG_LEVEL", "DEBUG").upper()
+logging.basicConfig(level=log_level, format="%(asctime)s - %(levelname)s - %(message)s")
 
 from fastapi import FastAPI, HTTPException, status
 from pydantic import BaseModel
@@ -24,7 +29,7 @@ from utils.encoder import JSONEncoder
 
 
 # Pydantic model for balance sheet request validation
-class BalanceSheetRequest(BaseModel):
+class ReportRequest(BaseModel):
     version: str
     ticker_symbol: str
     reporting_year: int
@@ -41,44 +46,74 @@ MONGO_DB = os.getenv("MONGO_DATABASE")
 client = MongoClient(f"mongodb://{MONGO_USER}:{MONGO_PASSWORD}@database:27017/")
 db = client[MONGO_DB]
 
-# API logic
-@app.get("/")
-def read_root():
+def get_version_table(ticker_symbol: str, report_type: str) -> Dict:
+    collection = db[report_type]
+
+    # Query for all documents related to the specific ticker_symbol
+    query_result = collection.find({"ticker_symbol": ticker_symbol})
+
+    # Building the return dictionary
+    version_table = {}
+    for doc in query_result:
+        year = doc.get("reporting_year")
+        season = doc.get("reporting_season")
+        version = doc.get("version")
+
+        #logging.debug(f"Processing document: Year={year}, Season={season}, Version={version}")
+        # Ensure the year key exists in the version table
+        if year not in version_table:
+            version_table[year] = {}
+
+        # Add season and version information
+        version_table[year][season] = version
+
+    return version_table
+
+@app.get("/{ticker_symbol}/{report_type}/version_table")
+async def get_version_table_endpoint(ticker_symbol: str, report_type: str):
+    try:
+        reports = get_version_table(ticker_symbol, report_type)
+        return reports
+    except Exception as e:
+        logging.error(f"Error fetching version table: {e}", exc_info=True)
+        raise HTTPException(status_code=500, detail=f"An error occurred: {e}")
+
+
+@app.get("/health")
+def health_check():
     return {"Hello": "World"}
 
-@app.post("/balance_sheet/")
-async def create_balance_sheet(balance_sheet_request: BalanceSheetRequest):
-    collection = db.balance_sheets
-    existing_sheet = collection.find_one({
-        "ticker_symbol": balance_sheet_request.ticker_symbol,
-        "reporting_year": balance_sheet_request.reporting_year,
-        "reporting_season": balance_sheet_request.reporting_season
+@app.post("/create_report/{report_type}/")
+async def create_report(report_type: str, report_request: ReportRequest):
+    collection = db[report_type]  # Use report_type to select the appropriate collection
+    existing_report = collection.find_one({
+        "ticker_symbol": report_request.ticker_symbol,
+        "reporting_year": report_request.reporting_year,
+        "reporting_season": report_request.reporting_season
     })
 
-    if existing_sheet:
+    if existing_report:
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT,
-            detail="Balance sheet already exists"
+            detail=f"{report_type.capitalize()} report already exists"
         )
 
-    # Convert Pydantic model to dictionary for MongoDB insertion
-    balance_sheet_data = balance_sheet_request.dict()
-    collection.insert_one(balance_sheet_data)
-    return {"message": "Balance sheet created"}
+    report_data = report_request.dict()
+    collection.insert_one(report_data)
+    return {"message": f"{report_type.capitalize()} report created"}
 
-@app.get("/balance_sheet/{ticker_symbol}/{year}/{season}")
-async def get_balance_sheet(ticker_symbol: str, year: int, season: int):
-    collection = db.balance_sheets
-    balance_sheet = collection.find_one({"ticker_symbol": ticker_symbol, "reporting_year": year, "reporting_season": season})
-    if balance_sheet:
-        # Serialize MongoDB document using the custom JSON Encoder
-        return json.loads(json.dumps(balance_sheet, cls=JSONEncoder))
-    raise HTTPException(status_code=404, detail="Balance sheet not found")
+@app.get("/{ticker_symbol}/{report_type}/{year}/{season}")
+async def get_report(ticker_symbol: str, report_type: str, year: int, season: int):
+    collection = db[report_type]
+    report = collection.find_one({"ticker_symbol": ticker_symbol, "reporting_year": year, "reporting_season": season})
+    if report:
+        return json.loads(json.dumps(report, cls=JSONEncoder))
+    raise HTTPException(status_code=404, detail=f"{report_type.capitalize()} report not found")
 
-@app.delete("/balance_sheet/{ticker_symbol}/{year}/{season}")
-async def delete_balance_sheet(ticker_symbol: str, year: int, season: int):
-    collection = db.balance_sheets
+@app.delete("/{ticker_symbol}/{report_type}/{year}/{season}")
+async def delete_report(ticker_symbol: str, report_type: str, year: int, season: int):
+    collection = db[report_type]
     result = collection.delete_one({"ticker_symbol": ticker_symbol, "reporting_year": year, "reporting_season": season})
     if result.deleted_count:
-        return {"message": "Balance sheet deleted"}
-    raise HTTPException(status_code=404, detail="Balance sheet not found")
+        return {"message": f"{report_type.capitalize()} report deleted"}
+    raise HTTPException(status_code=404, detail=f"{report_type.capitalize()} report not found")

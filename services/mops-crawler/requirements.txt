@@ -1,0 +1,7 @@
+pandas==2.0.3
+lxml==4.9.3
+#html5lib==1.1
+#beautifulsoup4==4.12.2
+requests==2.31.0
+fastapi==0.105.0
+uvicorn==0.25.0

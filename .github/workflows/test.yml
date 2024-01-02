@@ -1,4 +1,4 @@
-name: TEST API
+name: API Endpoint Tests
 
 on: [push, pull_request]
 
