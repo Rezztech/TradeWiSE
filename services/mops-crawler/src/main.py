@@ -50,7 +50,7 @@ def rate_limited(func):
         return func(*args, **kwargs)
     return wrapped
 
-limiter = RateLimiter(calls_per_second=0.1)
+limiter = RateLimiter(calls_per_second=10)
 app = FastAPI()
 
 @rate_limited
@@ -90,10 +90,15 @@ def crawl_financial_report(ticker_symbol, report_type, year, season):
         logging.error(f"Request error: {e}")
         return {"status_code": 500, "message": "Internal Server Error"}
 
-def sanitize_balance_sheet(year, season, response_text):
+# Listed companies, OTC (Over-the-Counter) companies, and emerging stock companies have started to adopt IFRSs (International Financial Reporting Standards) for financial statement preparation since 2013.
+def sanitize_balance_sheet_ifrs(year, season, response_text):
     if "查無所需資料！" in response_text:
         logging.info("No data found for the given parameters.")
         return {"status_code": 200, "data": {"version": "NDF"}}
+
+    if "Too many query requests from your ip" in response_text:
+        logging.info("Request frequency exceeded the allowed limit.")
+        return {"status_code": 429, "message": "Request frequency exceeded the allowed limit"}
 
     try:
         html_dataframe = pandas.read_html(StringIO(response_text))[1].fillna("")
@@ -141,7 +146,7 @@ def generate_post_data(ticker_symbol, year, season, data):
 
 def sanitize_report(report_type, year, season, response_text):
     if report_type == "balance_sheet":
-        return sanitize_balance_sheet(year, season, response_text)
+        return sanitize_balance_sheet_ifrs(year, season, response_text)
     elif report_type == "income_statement":
         # return sanitize_income_statement(response_text, year, season)
         pass

@@ -170,8 +170,8 @@ def update_financial_reports():
         # Iterate over each report type and its corresponding supported version
         REPORT_TYPES = {
             'balance_sheet': 'v1',
-            'income_statement': 'v1',
-            'cash_flow': 'v1'
+#            'income_statement': 'v1',
+#            'cash_flow': 'v1'
         }
 
         for report_type, supported_version in REPORT_TYPES.items():
@@ -204,6 +204,11 @@ def update_financial_reports():
                 past_version = report_version_table.get(past_year, {}).get(past_season, None)
                 logging.debug(f"Version for {ticker_symbol} {report_type} {past_year} {past_season}: {past_version}")
 
+                # ROC GAAP not supported
+                if past_year == "101":
+                    logging.info(f"ROC GAAP not supported")
+                    break
+
                 # First check to minimize the crawler request if the version is already "NDF"
                 if past_version == "NDF":
                     logging.debug(f"No further data to update for {ticker_symbol} {report_type} before {past_year} {past_season}")
@@ -217,13 +222,11 @@ def update_financial_reports():
                 if retrieve_result["version"] == supported_version:
                     store_result = store_financial_report(report_type, retrieve_result)
                     logging.debug(f"Stored financial report for {ticker_symbol} {report_type} {past_year} {past_season}")
-                elif retrieve_result["version"] == "NDF":
-                    store_result = store_financial_report(report_type, retrieve_result)
-                    logging.info("No data found for %s %s %s", ticker_symbol, report_type, past_year, past_season)
 
                 # Second check after attempting to update, in case the crawler finds no new data
-                if past_version == "NDF":
-                    logging.debug(f"No further data to update for {ticker_symbol} {report_type} before {past_year} {past_season}")
+                elif retrieve_result["version"] == "NDF":
+                    store_result = store_financial_report(report_type, retrieve_result)
+                    logging.info("No data found for %s %s %s %s", ticker_symbol, report_type, past_year, past_season)
                     break
 
     logging.debug("Finished updating financial reports.")
