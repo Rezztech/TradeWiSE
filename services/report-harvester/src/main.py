@@ -13,14 +13,15 @@
 # Copyright (c) 2023 by wildfootw <wildfootw@wildfoo.tw>
 #
 
-from apscheduler.schedulers.background import BackgroundScheduler
-import requests
-from requests.exceptions import HTTPError
-import logging
-import time
-import os
 import datetime
+import logging
+import os
+import time
+
 import pytz
+import requests
+from apscheduler.schedulers.background import BackgroundScheduler
+from requests.exceptions import HTTPError
 
 # Set up logging
 log_level = os.environ.get("LOG_LEVEL", "DEBUG").upper()
@@ -249,4 +250,3 @@ def schedule_updates():
 
 if __name__ == '__main__':
     schedule_updates()
-

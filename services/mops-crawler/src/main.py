@@ -13,13 +13,14 @@
 # Copyright (c) 2023 by wildfootw <wildfootw@wildfoo.tw>
 #
 
-import requests
-import pandas
-import logging
 import functools
-import time
+import logging
 import os
+import time
 from io import StringIO
+
+import pandas
+import requests
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 
