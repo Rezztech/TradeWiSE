@@ -15,6 +15,7 @@
 
 import requests
 
+
 def test_balance_sheet():
     # Endpoint URL
     base_url = 'http://database-api/'

@@ -1,4 +1,4 @@
-FROM python:3.8-slim
+FROM python:3.11-slim
 WORKDIR /tests
 
 # Copy only what is needed for installing dependencies
@@ -10,4 +10,3 @@ COPY . /tests
 
 # Set the command to run tests
 CMD ["pytest"]
-

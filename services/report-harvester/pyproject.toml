@@ -1,0 +1,22 @@
+[tool.isort]
+line_length = 100
+src_paths = ["src"]
+
+[tool.poetry]
+name = "twse-crawler"
+version = "0.1.0"
+description = "Crawl Taiwan Stock Exchange (TWSE) data."
+authors = ["wildfootw <wildfootw@wildfoo.tw>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+aiohttp = "^3.9.1"
+beautifulsoup4 = "^4.12.2"
+html5lib = "^1.1"
+lxml = "^4.9.3"
+pandas = "^2.0.3"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

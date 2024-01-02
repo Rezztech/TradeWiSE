@@ -13,10 +13,6 @@
 # Copyright (c) 2023 by wildfootw <wildfootw@wildfoo.tw>
 #
 
-from fastapi import FastAPI, HTTPException, status
-from pymongo import MongoClient
-from utils.encoder import JSONEncoder
-from pydantic import BaseModel
 from typing import Dict
 import json
 import os
@@ -24,6 +20,13 @@ import logging
 
 log_level = os.environ.get("LOG_LEVEL", "DEBUG").upper()
 logging.basicConfig(level=log_level, format="%(asctime)s - %(levelname)s - %(message)s")
+
+from fastapi import FastAPI, HTTPException, status
+from pydantic import BaseModel
+from pymongo import MongoClient
+
+from utils.encoder import JSONEncoder
+
 
 # Pydantic model for balance sheet request validation
 class ReportRequest(BaseModel):

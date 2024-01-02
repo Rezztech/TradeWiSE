@@ -13,10 +13,10 @@
 # Copyright (c) 2023 by wildfootw <wildfootw@wildfoo.tw>
 #
 
-import requests
-import pandas
 from io import StringIO
 
+import pandas
+import requests
 
 # URLs for different types of financial reports
 balance_sheet_url = "https://mops.twse.com.tw/mops/web/ajax_t164sb03"       # URL for Balance Sheet
@@ -77,4 +77,3 @@ reporting_season = 4
 html_dataframe = crawl_financial_report(balance_sheet_url, ticker_symbol, reporting_year, reporting_season)
 data_dict = extract_balance_sheet(html_dataframe, reporting_year, reporting_season)
 print(data_dict)
-

@@ -1,5 +1,5 @@
 # Use an official Python runtime as a parent image
-FROM python:3.8-slim
+FROM python:3.11-slim
 
 # Set the working directory in the container
 WORKDIR /app
@@ -15,4 +15,3 @@ COPY src/ /app/
 
 # Run bot.py when the container launches
 CMD ["python", "./main.py"]
-

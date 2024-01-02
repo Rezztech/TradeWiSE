@@ -8,16 +8,12 @@ services:
       - ./config/.env
     networks:
       - tradewise-net
-    volumes:
-      - ./services/telegram-bot/src:/app # Bind mount for live development
 
   mops-crawler:
     build: ./services/mops-crawler
     restart: always
     networks:
       - tradewise-net
-    volumes:
-      - ./services/mops-crawler/src:/app # Bind mount for live development
     healthcheck:
       test: ["CMD-SHELL", "python -c \"import http.client; conn = http.client.HTTPConnection('localhost', 80); conn.request('GET', '/health'); response = conn.getresponse(); assert response.status == 200\""]
       interval: 10s
@@ -34,8 +30,6 @@ services:
         condition: service_healthy
       mops-crawler:
         condition: service_healthy
-    volumes:
-      - ./services/report-harvester/src:/app # Bind mount for live development
 
   fugle-market-data:
     build: ./services/fugle-market-data
@@ -44,14 +38,11 @@ services:
       - ./config/.env
     networks:
       - tradewise-net
-    volumes:
-      - ./services/fugle-market-data/src:/app # Bind mount for live development
 
   fugle-trading:
     build: ./services/fugle-trading
     restart: always
     volumes:
-      - ./services/fugle-trading/src:/app # Bind mount for live development
       - ./config/config.fugletrading.ini:/app/config.ini
       - ./config/cert.p12:/app/cert.p12
     networks:
@@ -62,24 +53,18 @@ services:
     restart: always
     networks:
       - tradewise-net
-    volumes:
-      - ./services/order-manager/src:/app # Bind mount for live development
 
   insight-engine:
     build: ./services/insight-engine
     restart: always
     networks:
       - tradewise-net
-    volumes:
-      - ./services/insight-engine/src:/app # Bind mount for live development
 
   logging:
     build: ./services/logging
     restart: always
     networks:
       - tradewise-net
-    volumes:
-      - ./services/logging/src:/app # Bind mount for live development
 
   database:
     image: mongo
@@ -100,8 +85,6 @@ services:
       - tradewise-net
     depends_on:
       - database
-    volumes:
-      - ./services/database-api/src:/app # Bind mount for live development
     healthcheck:
       test: ["CMD-SHELL", "python -c \"import http.client; conn = http.client.HTTPConnection('localhost', 80); conn.request('GET', '/health'); response = conn.getresponse(); assert response.status == 200\""]
       interval: 10s
@@ -114,4 +97,3 @@ networks:
 
 volumes:
   db-data:
-
