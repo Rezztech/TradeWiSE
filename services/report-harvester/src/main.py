@@ -133,17 +133,22 @@ def download_company_info():
     symbol_column_index = len(root.xpath(symbol_column_locator)) + 1
     name_column_locator = '//tr//*[normalize-space()=\'{}\']/preceding-sibling::*'.format('有價證券名稱')
     name_column_index = len(root.xpath(name_column_locator)) + 1
-    row_locator = '//tr'.format(base_url)
+    row_locator = '//tr[position()>1]'
     rows = root.xpath(row_locator)
 
     results = []
+    collection = db['company']
     for row in rows:
-        symbol_company = {
-            'symbol': row.xpath('.//td[{}]'.format(symbol_column_index))[0].text, 
-            'company': row.xpath('.//td[{}]'.format(name_column_index))[0].text
-        }
-        results.append(symbol_company)
-    db['company'].insert_many(results)
+        symbol = row.xpath('.//td[{}]'.format(symbol_column_index))[0].text
+        company = row.xpath('.//td[{}]'.format(name_column_index))[0].text
+        if collection.count_documents({'symbol': symbol}, limit = 1) == 0:
+            symbol_company = {
+                'symbol': symbol,
+                'company': company
+            }
+            results.append(symbol_company) 
+    if len(results) != 0:
+        collection.insert_many(results)
 
 def retrieve_financial_report_version_table(ticker_symbol, report_type):
     base_url = "http://database-api"
