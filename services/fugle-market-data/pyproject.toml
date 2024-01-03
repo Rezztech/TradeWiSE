@@ -1,0 +1,14 @@
+[tool.poetry]
+name = "fugle-market-data"
+version = "0.1.0"
+description = "Fetch market data from Fugle API"
+authors = ["wildfootw <wildfootw@wildfoo.tw>", "soyccan <soyccan@gmail.com>"]
+
+[tool.poetry.dependencies]
+python = "^3.11"
+fugle-marketdata = "^1.0.2"
+fastapi = "^0.104.1"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
