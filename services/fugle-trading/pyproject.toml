@@ -1,0 +1,15 @@
+[tool.poetry]
+name = "fugle-trading"
+version = "0.1.0"
+description = "Fugle trading API client"
+authors = ["soyccan <soyccan@gmail.com>"]
+
+[tool.poetry.dependencies]
+python = "^3.11"
+fastapi = "^0.108.0"
+fugle-trade = "^1.1.2"
+uvicorn = "^0.25.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
