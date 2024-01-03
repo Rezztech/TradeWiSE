@@ -23,6 +23,8 @@ services:
   report-harvester:
     build: ./services/report-harvester
     restart: always
+    env_file:
+      - ./config/.env
     networks:
       - tradewise-net
     depends_on:
