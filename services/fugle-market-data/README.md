@@ -1,0 +1,2 @@
+- [Fugle MarketData API Key](https://developer.fugle.tw/docs/key/)
+- [Fugle MarketData API Docs](https://developer.fugle.tw/docs/data/http-api/getting-started)
