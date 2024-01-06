@@ -1,5 +1,7 @@
 # TradeWiSE
-###### tags: `financial` `stock`
+
+[![hackmd-github-sync-badge](https://hackmd.io/1wmKYf4ZTs-fwh1vofwCOQ/badge)](https://hackmd.io/1wmKYf4ZTs-fwh1vofwCOQ)
+
 ![DALL·E 2023-12-02 00.04.25 - A sleek and modern logo for a financial technology service named 'TradeWiSE'. The logo should embody elements that represent trading and wisdom, like ](./images/logo.png)
 
 ## About TradeWiSE: A Chatbot for Smarter TWSE Investing
@@ -71,3 +73,6 @@ The rationale behind using different licenses in this project is to accommodate 
 ### Note to Contributors
 
 All contributions to the TradeWiSE project, regardless of size, are considered to be released under the Mozilla Public License 2.0, unless specified otherwise. Contributions to the insight-engine service should adhere to the MIT License.
+
+## Maintenance and Support
+[GitHub Repository](https://github.com/Rezztech/TradeWiSE)
