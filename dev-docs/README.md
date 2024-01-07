@@ -79,16 +79,41 @@
 * 描述：這個群組專注於用戶與系統之間的直接互動（`telegram-bot`），包括接收用戶指令和提供反饋，以及與其他服務的資料交換和指令執行。
 * [Link](./UserInteractionAndCommunicationGroup.md)
 
-### Technology Stack and Frameworks (主要技術和框架)
-在此專案中，我們採用了一系列的技術和工具，以實作系統的開發、部署和運維。這些技術包括：
-* Docker：作為主要的容器化平台，Docker 被用於封裝和部署各個服務。它為我們的服務提供了一致和可移植的環境，使部署和維護變得更加容易。
-* Git：Git 是我們的版本控制系統，它幫助我們管理專案的變更歷史，並支持多人協作開發。
+## Environment Setup and Configuration
 
-在這些核心技術的基礎上，我們的各個服務可能會選擇使用不同的語言和框架，具體包括但不限於：
-* Python：許多服務選擇 Python 作為開發語言，特別是那些涉及到資料處理和分析的服務。
-    * FastAPI：對於需要高性能 API 的服務，FastAPI 是一個常用選擇。它以其快速、簡潔且易於使用的特性而著稱，適合快速開發現代 Web 應用程序。
+To set up the TradeWiSE application, you need to configure several services, each potentially requiring unique configuration files and environment variables. This document guides you through setting up the configuration for the fugle-trading service as an example.
 
-此外，專案中的服務可能會根據各自的需求和特點選擇適合的技術和工具，這種靈活性使得我們能夠針對不同的問題選擇最合適的解決方案。
+### Configuring the fugle-trading Service
+The fugle-trading service requires a configuration file (config.fugletrading.ini) and a certificate file (cert.p12).
+
+Steps:
+* Initial Setup:
+    * Navigate to the config-example directory in the TradeWiSE project.
+    * You will find config.fugletrading.ini.example and cert.p12.example.
+
+* Create Actual Config Files:
+    * Copy config.fugletrading.ini.example and cert.p12.example from the config-example directory to the config directory.
+    * Rename config.fugletrading.ini.example to config.fugletrading.ini.
+    * Rename cert.p12.example to cert.p12.
+
+* Edit the Configuration File:
+    * Open config.fugletrading.ini in a text editor.
+    * Fill in the actual values for API keys, secrets, and other configurations as needed.
+    * Ensure the certificate path in config.fugletrading.ini points to /app/cert.p12.
+
+### Environment Variables:
+If the service requires environment variables (e.g., for the Telegram bot), you need to set these up in a .env file located in the config directory.
+
+### Running the Services:
+With the configurations in place, you can start the services using Docker Compose:
+
+```
+docker-compose up -d
+```
+
+This command will launch all services defined in your docker-compose.yml, applying the configurations you've set up.
+
+Note: For production environments, ensure the security of your configuration files, especially those containing sensitive information like API keys or certificates.
 
 
 ## Code Style and Development Standards
