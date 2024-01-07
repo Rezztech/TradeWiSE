@@ -10,7 +10,7 @@ TradeWiSE is a compact and sophisticated chatbot. It aims to semi-automate the i
 TradeWiSE 是一款小型聊天機器人。目的在半自動化台灣證券交易所（TWSE）的投資過程，適合忙碌生活中希望維持投資的人士。設計上允許協作者輕鬆加入客製化分析方法，並且可以在開源授權下與他人共同開發其他通用功能。每個實例都是為個人使用設計，適合具有一定開發能力的用戶。
 
 ### Core Features (and More on the Horizon)
-* Automated Financial Analysis: Executes collaborator-customized strategies, automatically calculating targeted financial metrics. 
+* Automated Financial Analysis: Executes collaborator-customized strategies, automatically calculating targeted financial metrics.
     * 自動財務分析：執行協作者客製化的策略，自動計算關注的財務指標。
 * Market Tracking: Continuously monitors your selected companies and automatically executes trades at optimal times.
     * 市場追蹤：持續追蹤關注的公司，並在合適的時機自動執行交易。
