@@ -1,0 +1,2 @@
+- [Fugle Trading API Key](https://fugletradingapi.esunsec.com.tw/keys/apikey/APIKeyManagement)
+- [Fugle Trading API Docs](https://developer.fugle.tw/docs/trading/reference/python)
