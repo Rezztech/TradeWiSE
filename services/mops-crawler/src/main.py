@@ -202,12 +202,8 @@ def download_company_info():
         response = requests.get(base_url)
         response.raise_for_status()
 
-    except HTTPError as http_err:
-        logging.error(f"HTTP error occurred while crawling: {http_err}")
-        raise
-
     except Exception as err:
-        logging.error(f"Error occurred while crawling: {err}")
+        logging.error(f"HTTP error occurred while crawling: {err}")
         raise
 
     listed_companies_data = response.text

@@ -99,14 +99,16 @@ def store_financial_report(report_type, post_data):
 def retrieve_ticker_symbols():
     companies = get_companies_by_crawler()
     synchronize_company(companies)
+    symbols = [company['symbol'] for company in companies]
+    return symbols
 
-def get_companies_by_crawler() -> dict:
+def get_companies_by_crawler() -> list:
     base_url = 'http://mops-crawler'
     url = f'{base_url}/get_all_companies'
     try:
         response = requests.get(url)
         response.raise_for_status()
-        return response.text
+        return response.json()
     except HTTPError as http_err:
         logging.error(f"HTTP error occurred while retrieving report version table: {http_err}")
         raise
@@ -114,7 +116,7 @@ def get_companies_by_crawler() -> dict:
         logging.error(f"Error occurred while retrieving report version table: {err}")
         raise
 
-def synchronize_company(companies: dict):
+def synchronize_company(companies: list):
     base_url = 'http://database-api'
     url = f'{base_url}/synchronize_company_table'
 
