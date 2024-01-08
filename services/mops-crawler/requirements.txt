@@ -5,3 +5,4 @@ lxml==4.9.3
 requests==2.31.0
 fastapi==0.105.0
 uvicorn==0.25.0
+lxml==5.0.0

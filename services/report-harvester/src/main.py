@@ -22,15 +22,6 @@ import pytz
 import requests
 from apscheduler.schedulers.background import BackgroundScheduler
 from requests.exceptions import HTTPError
-from pymongo import MongoClient
-from lxml import etree
-
-# Load environment variables
-MONGO_USER = os.getenv("MONGO_INITDB_ROOT_USERNAME")
-MONGO_PASSWORD = os.getenv("MONGO_INITDB_ROOT_PASSWORD")
-MONGO_DB = os.getenv("MONGO_DATABASE")
-client = MongoClient(f"mongodb://{MONGO_USER}:{MONGO_PASSWORD}@database:27017/")
-db = client[MONGO_DB]
 
 # Set up logging
 log_level = os.environ.get("LOG_LEVEL", "DEBUG").upper()
@@ -106,49 +97,36 @@ def store_financial_report(report_type, post_data):
         return {"status_code": 500, "message": "Internal Server Error"}
 
 def retrieve_ticker_symbols():
-    download_company_info()
-    collection = db['company']
-    docs = collection.find({},{'symbol': 1})
-    symbols = [doc['symbol']for doc in docs]
-    return symbols
+    companies = get_companies_by_crawler()
+    synchronize_company(companies)
 
-def download_company_info():
-    base_url = 'https://isin.twse.com.tw/isin/class_main.jsp?owncode=&stockname=&isincode=&market=1&issuetype=1&industry_code=&Page=1&chklike=Y'
+def get_companies_by_crawler() -> dict:
+    base_url = 'http://mops-crawler'
+    url = f'{base_url}/get_all_companies'
     try:
-        response = requests.get(base_url)
+        response = requests.get(url)
         response.raise_for_status()
-
+        return response.text
     except HTTPError as http_err:
-        logging.error(f"HTTP error occurred while crawling: {http_err}")
+        logging.error(f"HTTP error occurred while retrieving report version table: {http_err}")
         raise
-
     except Exception as err:
-        logging.error(f"Error occurred while crawling: {err}")
+        logging.error(f"Error occurred while retrieving report version table: {err}")
         raise
 
-    listed_companies_data = response.text
-    root = etree.HTML(listed_companies_data)
+def synchronize_company(companies: dict):
+    base_url = 'http://database-api'
+    url = f'{base_url}/synchronize_company_table'
 
-    symbol_column_locator = '//tr//*[normalize-space()=\'{}\']/preceding-sibling::*'.format('有價證券代號')
-    symbol_column_index = len(root.xpath(symbol_column_locator)) + 1
-    name_column_locator = '//tr//*[normalize-space()=\'{}\']/preceding-sibling::*'.format('有價證券名稱')
-    name_column_index = len(root.xpath(name_column_locator)) + 1
-    row_locator = '//tr[position()>1]'
-    rows = root.xpath(row_locator)
-
-    results = []
-    collection = db['company']
-    for row in rows:
-        symbol = row.xpath('.//td[{}]'.format(symbol_column_index))[0].text
-        company = row.xpath('.//td[{}]'.format(name_column_index))[0].text
-        if collection.count_documents({'symbol': symbol}, limit = 1) == 0:
-            symbol_company = {
-                'symbol': symbol,
-                'company': company
-            }
-            results.append(symbol_company) 
-    if len(results) != 0:
-        collection.insert_many(results)
+    try:
+        response = requests.post(url, json=companies)
+        response.raise_for_status()
+    except HTTPError as http_err:
+        logging.error(f"HTTP error occurred while synchronizing company table: {http_err}")
+        raise
+    except Exception as err:
+        logging.error(f"Error occurred while synchronizing company  table: {err}")
+        raise
 
 def retrieve_financial_report_version_table(ticker_symbol, report_type):
     base_url = "http://database-api"
