@@ -22,6 +22,7 @@ from io import StringIO
 import pandas
 import requests
 from fastapi import FastAPI, HTTPException
+from lxml import etree
 from pydantic import BaseModel
 
 # Set up logging
@@ -193,3 +194,35 @@ def get_financial_report(report_type: str, ticker_symbol: str, year: int, season
 
     # If everything went well, return the sanitized data
     return result["data"]
+
+@app.get('/get_all_companies')
+def download_company_info():
+    base_url = 'https://isin.twse.com.tw/isin/class_main.jsp?owncode=&stockname=&isincode=&market=1&issuetype=1&industry_code=&Page=1&chklike=Y'
+    try:
+        response = requests.get(base_url)
+        response.raise_for_status()
+
+    except Exception as err:
+        logging.error(f"HTTP error occurred while crawling: {err}")
+        raise
+
+    listed_companies_data = response.text
+    root = etree.HTML(listed_companies_data)
+
+    symbol_column_locator = '//tr//*[normalize-space()=\'{}\']/preceding-sibling::*'.format('有價證券代號')
+    symbol_column_index = len(root.xpath(symbol_column_locator)) + 1
+    name_column_locator = '//tr//*[normalize-space()=\'{}\']/preceding-sibling::*'.format('有價證券名稱')
+    name_column_index = len(root.xpath(name_column_locator)) + 1
+    row_locator = '//tr[position()>1]'
+    rows = root.xpath(row_locator)
+
+    results = []
+    for row in rows:
+        symbol = row.xpath('.//td[{}]'.format(symbol_column_index))[0].text
+        company = row.xpath('.//td[{}]'.format(name_column_index))[0].text
+        symbol_company = {
+            'symbol': symbol,
+            'company': company
+        }
+        results.append(symbol_company)
+    return results

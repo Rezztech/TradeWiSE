@@ -21,7 +21,7 @@ from typing import Dict
 log_level = os.environ.get("LOG_LEVEL", "DEBUG").upper()
 logging.basicConfig(level=log_level, format="%(asctime)s - %(levelname)s - %(message)s")
 
-from fastapi import FastAPI, HTTPException, status
+from fastapi import FastAPI, HTTPException, Request, status
 from pydantic import BaseModel
 from pymongo import MongoClient
 
@@ -117,3 +117,10 @@ async def delete_report(ticker_symbol: str, report_type: str, year: int, season:
     if result.deleted_count:
         return {"message": f"{report_type.capitalize()} report deleted"}
     raise HTTPException(status_code=404, detail=f"{report_type.capitalize()} report not found")
+
+@app.post("/synchronize_company_table")
+async def synchronize_company_table(request: Request):
+    collection = db['company']
+    collection.drop()
+    companies = await request.json()
+    collection.insert_many(companies)

@@ -96,10 +96,39 @@ def store_financial_report(report_type, post_data):
         logging.error(f"Request error when storing data: {e}")
         return {"status_code": 500, "message": "Internal Server Error"}
 
-
 def retrieve_ticker_symbols():
-    # [TODO] Implement logic to retrieve the list of companies from the database
-    return ["2330", "2331"]
+    companies = get_companies_by_crawler()
+    synchronize_company(companies)
+    symbols = [company['symbol'] for company in companies]
+    return symbols
+
+def get_companies_by_crawler() -> list:
+    base_url = 'http://mops-crawler'
+    url = f'{base_url}/get_all_companies'
+    try:
+        response = requests.get(url)
+        response.raise_for_status()
+        return response.json()
+    except HTTPError as http_err:
+        logging.error(f"HTTP error occurred while retrieving company table from crawler: {http_err}")
+        raise
+    except Exception as err:
+        logging.error(f"Error occurred while retrieving company table from crawler: {err}")
+        raise
+
+def synchronize_company(companies: list):
+    base_url = 'http://database-api'
+    url = f'{base_url}/synchronize_company_table'
+
+    try:
+        response = requests.post(url, json=companies)
+        response.raise_for_status()
+    except HTTPError as http_err:
+        logging.error(f"HTTP error occurred while synchronizing company table: {http_err}")
+        raise
+    except Exception as err:
+        logging.error(f"Error occurred while synchronizing company  table: {err}")
+        raise
 
 def retrieve_financial_report_version_table(ticker_symbol, report_type):
     base_url = "http://database-api"
