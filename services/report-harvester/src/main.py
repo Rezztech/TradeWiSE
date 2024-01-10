@@ -110,10 +110,10 @@ def get_companies_by_crawler() -> list:
         response.raise_for_status()
         return response.json()
     except HTTPError as http_err:
-        logging.error(f"HTTP error occurred while retrieving report version table: {http_err}")
+        logging.error(f"HTTP error occurred while retrieving company table from crawler: {http_err}")
         raise
     except Exception as err:
-        logging.error(f"Error occurred while retrieving report version table: {err}")
+        logging.error(f"Error occurred while retrieving company table from crawler: {err}")
         raise
 
 def synchronize_company(companies: list):
