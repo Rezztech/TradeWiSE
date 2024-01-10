@@ -21,7 +21,7 @@ from typing import Dict
 log_level = os.environ.get("LOG_LEVEL", "DEBUG").upper()
 logging.basicConfig(level=log_level, format="%(asctime)s - %(levelname)s - %(message)s")
 
-from fastapi import FastAPI, HTTPException, status, Request
+from fastapi import FastAPI, HTTPException, Request, status
 from pydantic import BaseModel
 from pymongo import MongoClient
 

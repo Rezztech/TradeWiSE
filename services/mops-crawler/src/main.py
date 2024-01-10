@@ -22,8 +22,8 @@ from io import StringIO
 import pandas
 import requests
 from fastapi import FastAPI, HTTPException
-from pydantic import BaseModel
 from lxml import etree
+from pydantic import BaseModel
 
 # Set up logging
 log_level = os.environ.get("LOG_LEVEL", "DEBUG").upper()
