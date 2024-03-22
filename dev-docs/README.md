@@ -116,9 +116,34 @@ This command will launch all services defined in your docker-compose.yml, applyi
 Note: For production environments, ensure the security of your configuration files, especially those containing sensitive information like API keys or certificates.
 
 
-## Code Style and Development Standards
-* Coding conventions (such as adherence to PEP 8 guidelines).
-* Standards for code commenting and documentation.
+## Code Style and Development Standards (Optional)
+### Coding conventions
+- [pre-commit-hooks](https://github.com/pre-commit/pre-commit-hooks):
+  - `trailing-whitespace`: Trims trailing whitespace
+  - `end-of-file-fixer`: Ensures files end with a newline
+
+- [isort](https://github.com/PyCQA/isort):
+  - `isort`: Sorts import statements according to the isort configuration
+
+Some basic Python conventions:
+- Use descriptive names (no abbreviations) for variables, functions, classes, etc.
+- Follow the `lowercase_with_underscores` style for functions/variables
+- Use `CapitalizedWords` for class names
+- Indent and space your code properly for readability
+- Add docstrings to document your code
+
+### Standards for code commenting and documentation.
+#### Docstrings
+- All public functions, classes, and modules should have docstrings following the [Google Python Style Guide](https://google.github.io/styleguide/pyguide.html#38-comments-and-docstrings)
+- Docstrings should describe the purpose, parameters, return values, and any exceptions raised
+- Example usage can be included for complex functions/classes
+
+#### Comments
+- Use comments sparingly - strive to write self-documenting code
+- Comments should explain the "why" behind the code, not the "what" (which should be self-evident)
+
+#### Documentation
+- Keep important design decisions documented, e.g., in a DESIGN.md file
 
 ### Standards for commits and merge requests
 We follow the [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/) specification for commit messages. This lightweight convention provides an easy set of rules for creating an explicit commit history, which makes it easier to write automated tools on top of it. The commit message should be structured as follows:
@@ -152,13 +177,38 @@ This section deals with how to take the code from the development stage to a sta
 * Post-Deployment Configuration: Details on any configuration or steps required after deployment, such as database migrations, cache invalidation, or setting environment variables in the production environment.
 
 ## Testing Strategy
-### 測試與部署
-- 單元測試: 對關鍵功能進行單元測試，確保穩定性和可靠性。
-- 部署: 在家中的伺服器上部署此機器人。
+### API Endpoint Tests
+We use GitHub Actions to run automated tests for our API endpoints on every push and pull request. The tests are executed within Docker containers, ensuring a consistent and isolated testing environment.
 
-* Setting up the testing environment.
-* How to run and write tests.
-* Coverage and quality check metrics.
+The workflow is defined in `.github/workflows/api-tests.yml` and includes the following steps:
+
+1. Checkout the repository
+2. Start the required services using `docker-compose -f docker-compose.test.yml up -d`
+3. Run the tests with `docker-compose -f docker-compose.test.yml run test`
+4. Stop the services with `docker-compose -f docker-compose.test.yml down`
+
+#### Running Tests Locally
+To run the API endpoint tests locally, you'll need to have Docker and Docker Compose installed. Then, you can use the following commands:
+
+```bash
+# Start the required services
+docker-compose -f docker-compose.test.yml up -d
+
+# Run the tests
+docker-compose -f docker-compose.test.yml run test
+
+# Stop the services
+docker-compose -f docker-compose.test.yml down
+```
+
+#### Writing Tests
+[Explain any conventions, best practices, or guidelines for writing new API endpoint tests in your project.]
+
+#### Code Coverage
+[If applicable, describe how you measure and track code coverage for your API endpoint tests.]
+
+#### Test Maintenance
+[Discuss any processes or practices you follow to keep your API endpoint tests up-to-date and maintainable as the codebase evolves.]
 
 ## Appendix and Reference Materials
 * [Day 02 - 數據即財富：股市資料來源與取得 ](https://ithelp.ithome.com.tw/articles/10287328)
