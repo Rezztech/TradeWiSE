@@ -119,7 +119,24 @@ Note: For production environments, ensure the security of your configuration fil
 ## Code Style and Development Standards
 * Coding conventions (such as adherence to PEP 8 guidelines).
 * Standards for code commenting and documentation.
-* Standards for commits and merge requests.
+
+### Standards for commits and merge requests
+We follow the [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/) specification for commit messages. This lightweight convention provides an easy set of rules for creating an explicit commit history, which makes it easier to write automated tools on top of it. The commit message should be structured as follows:
+```
+<type>[optional scope]: <description>
+[optional body]
+[optional footer(s)]
+```
+The commit `type` can be one of the following:
+
+- `fix`: a commit that patches a bug
+- `feat`: a commit that introduces a new feature
+- `BREAKING CHANGE`: a commit that introduces a breaking API change (can be part of any type)
+- Other types like `build`, `chore`, `ci`, `docs`, `style`, `refactor`, `perf`, `test`, etc.
+
+The commit message should clearly describe the changes made, and breaking changes should be indicated by appending `!` after the type or by including a `BREAKING CHANGE` footer.
+
+For more details and examples, refer to the [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/) specification.
 
 ## Development Process and Workflow
 * Description of development, testing, and deployment processes.
