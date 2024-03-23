@@ -43,7 +43,7 @@ MONGO_PASSWORD = os.getenv("MONGO_INITDB_ROOT_PASSWORD")
 MONGO_DB = os.getenv("MONGO_DATABASE")
 
 # MongoDB connection
-client = MongoClient(f"mongodb://{MONGO_USER}:{MONGO_PASSWORD}@database:27017/")
+client = MongoClient(f"mongodb://{MONGO_USER}:{MONGO_PASSWORD}@mongodb:27017/")
 db = client[MONGO_DB]
 
 def get_version_table(ticker_symbol: str, report_type: str) -> Dict:
