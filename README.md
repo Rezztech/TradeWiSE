@@ -2,7 +2,7 @@
 
 [![hackmd-github-sync-badge](https://hackmd.io/1wmKYf4ZTs-fwh1vofwCOQ/badge)](https://hackmd.io/1wmKYf4ZTs-fwh1vofwCOQ)
 
-![DALL·E 2023-12-02 00.04.25 - A sleek and modern logo for a financial technology service named 'TradeWiSE'. The logo should embody elements that represent trading and wisdom, like ](./images/logo.png)
+![DALL·E 2023-12-02 00.04.25 - A sleek and modern logo for a financial technology service named 'TradeWiSE'. The logo should embody elements that represent trading and wisdom, like ](./images/logo-1280x640.png)
 
 ## About TradeWiSE: A Chatbot for Smarter TWSE Investing
 TradeWiSE is a compact and sophisticated chatbot. It aims to semi-automate the investment process in the Taiwan Stock Exchange (TWSE), catering to those with busy lifestyles who wish to maintain their investments. The design allows for easy integration of customized analysis techniques and collaborative development of common features under an open-source license. Each instance is tailored for personal use, making it ideal for users with some development skills.
