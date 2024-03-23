@@ -80,40 +80,59 @@
 * [Link](./UserInteractionAndCommunicationGroup.md)
 
 ## Environment Setup and Configuration
+Clone the repository from GitHub
+```
+git clone git@github.com:Rezztech/TradeWiSE.git
+```
 
-To set up the TradeWiSE application, you need to configure several services, each potentially requiring unique configuration files and environment variables. This document guides you through setting up the configuration for the fugle-trading service as an example.
+### Environment Variables
+Copy the example configuration files:
+```
+cp -R config.example config
+```
 
-### Configuring the fugle-trading Service
-The fugle-trading service requires a configuration file (config.fugletrading.ini) and a certificate file (cert.p12).
+The `config` directory will now contain the following structure:
+```
+config
+├── .env
+└── fugle-trading
+    ├── cert.p12
+    └── ...
+```
 
-Steps:
-* Initial Setup:
-    * Navigate to the config-example directory in the TradeWiSE project.
-    * You will find config.fugletrading.ini.example and cert.p12.example.
+Open the `.env` file and set the required environment variables, as well as any additional settings for specific services you plan to use.
+```
+# TradeWiSE Environment Variables
 
-* Create Actual Config Files:
-    * Copy config.fugletrading.ini.example and cert.p12.example from the config-example directory to the config directory.
-    * Rename config.fugletrading.ini.example to config.fugletrading.ini.
-    * Rename cert.p12.example to cert.p12.
+LOG_LEVEL="DEBUG"
 
-* Edit the Configuration File:
-    * Open config.fugletrading.ini in a text editor.
-    * Fill in the actual values for API keys, secrets, and other configurations as needed.
-    * Ensure the certificate path in config.fugletrading.ini points to /app/cert.p12.
+...
 
-### Environment Variables:
-If the service requires environment variables (e.g., for the Telegram bot), you need to set these up in a .env file located in the config directory.
+# MariaDB configurations
+MONGO_INITDB_ROOT_USERNAME="tradewise_user"
+MONGO_INITDB_ROOT_PASSWORD="XXXXXXXXXXXXXXXX"
+MONGO_DATABASE="tradewise"
 
-### Running the Services:
+...
+```
+
+Some services may require additional configuration files. In such cases, a specific directory will be provided for that service's configuration.
+
+For example: The fugle-trading service requires a configuration file (config.fugletrading.ini) and a certificate file (cert.p12).
+
+To set up the Fugle Trading Service:
+* Export the `cert.p12` file from E.SUN Securities and place it in the config/fugle-trading directory, replacing the existing file.
+* Download the `config.ini.example` file from the Fugle Trading API key management page.
+* Open the existing `config/fugle-trading/config.fugletrading.ini` file in a text editor.
+* Paste the necessary values from `config.ini.example` into `config.fugletrading.ini`
+
+### Running the Services
 With the configurations in place, you can start the services using Docker Compose:
 
 ```
 docker-compose up -d
 ```
-
-This command will launch all services defined in your docker-compose.yml, applying the configurations you've set up.
-
-Note: For production environments, ensure the security of your configuration files, especially those containing sensitive information like API keys or certificates.
+This command will launch the services defined in your `docker-compose.yml`, applying the configurations you've set up. Note that the `docker-compose.yml` file should be modified by each user to include the desired combination of services.
 
 
 ## Code Style and Development Standards (Optional)
