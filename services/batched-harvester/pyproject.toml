@@ -11,11 +11,9 @@ readme = "README.md"
 
 [tool.poetry.dependencies]
 python = "^3.11"
-aiohttp = "^3.9.1"
-beautifulsoup4 = "^4.12.2"
-html5lib = "^1.1"
-lxml = "^4.9.3"
-pandas = "^2.0.3"
+requests = "^2.31.0"
+apscheduler = "^3.10.4"
+pytz = "^2024.1"
 
 [build-system]
 requires = ["poetry-core"]
