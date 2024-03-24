@@ -22,8 +22,8 @@ services:
     volumes:
       - ./services/mops-crawler/src:/app # Bind mount for live development. Remove this for production.
 
-  report-harvester:
-    build: ./services/report-harvester
+  batched-harvester:
+    build: ./services/batched-harvester
     restart: always
     networks:
       - tradewise-net
@@ -33,7 +33,7 @@ services:
       mops-crawler:
         condition: service_healthy
     volumes:
-      - ./services/report-harvester/src:/app # Bind mount for live development. Remove this for production.
+      - ./services/batched-harvester/src:/app # Bind mount for live development. Remove this for production.
 
   fugle-market-data:
     build: ./services/fugle-market-data

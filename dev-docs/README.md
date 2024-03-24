@@ -12,10 +12,10 @@
 * 個人化服務設計：每個 Telegram 機器人實例被設計為服務單一用戶，從而確保了服務的客製化和隱私保護。
 
 
-#### 報告蒐集服務 `report-harvester`
+#### 報告蒐集服務 `batched-harvester`
 專注於從多個來源自動蒐集和處理財務及市場相關的報告。它的主要職責和功能包括：
 * 自動化數據蒐集：這個服務定期從不同的資料來源，如 mops-crawler，自動蒐集財務報告和市場資料。這種自動化過程確保了資料的及時性和完整性，並減少了手動工作的需要。
-* 與資料庫的接口：`report-harvester` 負責將處理好的資料傳輸到中央資料庫，例如 `database-api`。這確保了所有收集的資料都能被儲存和檢索，用於後續的分析和決策。
+* 與資料庫的接口：`batched-harvester` 負責將處理好的資料傳輸到中央資料庫，例如 `database-api`。這確保了所有收集的資料都能被儲存和檢索，用於後續的分析和決策。
 * 定期更新和維護：服務設計了機制以定期更新資料，並確保資料的時效性。此外，定期檢查和維護確保服務穩定運行，並及時處理任何潛在的問題。
 * 數據整合與處理：收集到的資料被整合和格式化，使之適用於進一步的分析。
 
@@ -61,8 +61,8 @@
 
 ### Service Interactions and Data Flow（服務互動和資料流）
 #### Data Collection and Integration Group（資料蒐集和整合群組）
-* 涉及的服務：`mops-crawler`, `report-harvester`, `database-api`
-* 描述：這個群組負責從外部來源蒐集財務報告（`mops-crawler`），加工和整合這些資料（`report-harvester`），並將它們儲存到資料庫中（`database-api`）。
+* 涉及的服務：`mops-crawler`, `batched-harvester`, `database-api`
+* 描述：這個群組負責從外部來源蒐集財務報告（`mops-crawler`），加工和整合這些資料（`batched-harvester`），並將它們儲存到資料庫中（`database-api`）。
 * [Link](./DataCollectionAndIntegrationGroup.md)
 #### Trading Strategy and Execution Group（交易策略和執行群組）
 * 涉及的服務：`fugle-market-data`, `fugle-trading`, `order-manager`, `database-api`
