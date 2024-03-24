@@ -19,6 +19,8 @@ services:
       interval: 10s
       timeout: 6s
       retries: 3
+    volumes:
+      - ./services/mops-crawler/src:/app # Bind mount for live development. Remove this for production.
 
   report-harvester:
     build: ./services/report-harvester
@@ -30,6 +32,8 @@ services:
         condition: service_healthy
       mops-crawler:
         condition: service_healthy
+    volumes:
+      - ./services/report-harvester/src:/app # Bind mount for live development. Remove this for production.
 
   fugle-market-data:
     build: ./services/fugle-market-data
@@ -69,7 +73,7 @@ services:
     networks:
       - tradewise-net
 
-  database:
+  mongodb:
     image: mongo
     restart: always
     env_file:
@@ -79,20 +83,35 @@ services:
     volumes:
       - db-data:/data/db
 
+  # mongo-express service is used for debugging purposes only.
+  # Please comment out or remove this service in production environments.
+  mongodb-express:
+    image: mongo-express:latest
+    env_file:
+      - ./config/.env
+    depends_on:
+      - mongodb
+    ports:
+      - "8081:8081"
+    networks:
+      - tradewise-net
+
   database-api:
-    build: ./services/database-api
+    build: ./services/mongodb-api
     restart: always
     env_file:
       - ./config/.env
     networks:
       - tradewise-net
     depends_on:
-      - database
+      - mongodb
     healthcheck:
       test: ["CMD-SHELL", "python -c \"import http.client; conn = http.client.HTTPConnection('localhost', 80); conn.request('GET', '/health'); response = conn.getresponse(); assert response.status == 200\""]
       interval: 10s
       timeout: 6s
       retries: 3
+    volumes:
+      - ./services/mongodb-api/src:/app # Bind mount for live development. Remove this for production.
 
 networks:
   tradewise-net:
