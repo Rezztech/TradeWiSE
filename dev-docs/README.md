@@ -132,6 +132,20 @@ Some basic Python conventions:
 - Indent and space your code properly for readability
 - Add docstrings to document your code
 
+#### Setup Pre-commit Hooks
+1. **Virtual Environment**:
+   - Create: `python -m venv .venv`
+   - Activate:
+     - Windows: `.venv\Scripts\activate`
+     - macOS/Linux: `source .venv/bin/activate`
+
+2. **Install Poetry** in the virtual environment: `pip install poetry`
+   - *Note*: While it's feasible to install Poetry within a `.venv` for project-specific usage, consider the [official installation method](https://python-poetry.org/docs/#installation) for managing multiple projects more effectively.
+
+3. **Install Dependencies**: Execute `poetry install --no-root` to install dependencies specified in `pyproject.toml`, excluding the project package itself.
+
+4. Initialize pre-commit hooks with `poetry run pre-commit install` to ensure code quality checks are performed before each commit.
+
 ### Standards for code commenting and documentation.
 #### Docstrings
 - All public functions, classes, and modules should have docstrings following the [Google Python Style Guide](https://google.github.io/styleguide/pyguide.html#38-comments-and-docstrings)
