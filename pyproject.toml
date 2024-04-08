@@ -9,6 +9,9 @@ description = "Enhancing TWSE Investment Experience with a Python-based Chatbot,
 authors = ["wildfootw <wildfootw@wildfoo.tw>", "soyccan <soyccan@gmail.com>"]
 readme = "README.md"
 
+[tool.poetry.dependencies]
+python = "^3.9"
+
 [tool.poetry.group.dev.dependencies]
 isort = "^5.13.2"
 pre-commit = "^3.6.0"
