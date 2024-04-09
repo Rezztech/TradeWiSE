@@ -1,5 +1,8 @@
 # Crawler Design
 
+## Flowchart
+![flowchart](./images/Flowchart.jpg)
+
 ### Modular Design:
 * Treat different types of financial reports (e.g., balance sheet, income statement, cash flow statement) as separate modules.
 * Implement specific parsing logic for each type of report.
